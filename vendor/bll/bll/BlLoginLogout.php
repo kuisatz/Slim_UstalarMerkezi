@@ -33,43 +33,56 @@ class BlLoginLogout extends \BLL\BLLSlim{
     
     /**
      * Data update function
-     * @param integer $id
      * @param array | null $params
      * @return array
      */
-    public function update($id = null, $params = array()) {
+    public function update($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('blLoginLogoutPDO');
-        return $DAL->update($id, $params);
+        return $DAL->update($params);
     }
     
     /**
      * Data delete function
-     * @param integer $id
+     * @param array | null $params
      * @return array
      */
-    public function delete($id = null) {
+    public function delete($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('blLoginLogoutPDO');
-        return $DAL->delete($id);
+        return $DAL->delete($params);
     }
 
     /**
      * get all data
+     * @param array | null $params
      * @return array
      */
-    public function getAll() {
+    public function getAll($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('blLoginLogoutPDO');
-        return $DAL->getAll();
+        return $DAL->getAll($params);
     }
     
     
     /**
-     *  
-     * @param array | null $params
+     * get private key  from public key
+     * @param array$params
      * @return array
      */
     public function pkControl($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('blLoginLogoutPDO');
         $resultSet = $DAL->pkControl($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * get private key temp from public temp key
+     * @param array$params
+     * @return array
+     * @author Mustafa Zeynel Dağlı
+     * @since 0.3 27/01/2016
+     */
+    public function pkTempControl($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('blLoginLogoutPDO');
+        $resultSet = $DAL->pkTempControl($params);  
         return $resultSet['resultSet'];
     }
 

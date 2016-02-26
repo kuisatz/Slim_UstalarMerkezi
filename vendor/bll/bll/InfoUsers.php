@@ -30,6 +30,26 @@ class InfoUsers extends \BLL\BLLSlim{
         $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
         return $DAL->insert($params);
     }
+    
+       /**
+     * Data insert function
+     * @param array | null $params
+     * @return array
+     */
+    public function insertTemp($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->insertTemp($params);
+    }
+        /**
+     * Data update function
+     * @param array | null $params
+     * @return array
+     */
+    public function updateTemp($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->updateTemp($params);
+    }
+    
       /**
      * Check Data function
      * @param array | null $params
@@ -43,32 +63,32 @@ class InfoUsers extends \BLL\BLLSlim{
     
     /**
      * Data update function
-     * @param integer $id
      * @param array | null $params
      * @return array
      */
-    public function update($id = null, $params = array()) {
+    public function update($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
-        return $DAL->update($id, $params);
+        return $DAL->update($params);
     }
     
     /**
      * Data delete function
-     * @param integer $id
+     * @param array | null $params
      * @return array
      */
-    public function delete($id = null) {
+    public function delete( $params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
-        return $DAL->delete($id);
+        return $DAL->delete($params);
     }
 
     /**
      * get all data
+     * @param array | null $params
      * @return array
      */
-    public function getAll() {
+    public function getAll($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
-        return $DAL->getAll();
+        return $DAL->getAll($params);
     }
     
     /**
@@ -95,15 +115,63 @@ class InfoUsers extends \BLL\BLLSlim{
     
      /**
      * Data delete action function
-     * @param integer $id
      * @param array | null $params
      * @return array
      */
-    public function deletedAct($id = null, $params = array()) {
+    public function deletedAct($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
-        return $DAL->deletedAct($id, $params);
+        return $DAL->deletedAct($params);
     }
     
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function setPrivateKey($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->setPrivateKey($params);
+    }
+     
+    /**
+     * get Public Key Temp
+     * @param array $params
+     * @return array
+     */
+    public function getPublicKeyTemp($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->getPublicKeyTemp($params);
+    }
+    
+    /**
+     * get User Id - pk
+     * @param array $params
+     * @return array
+     */
+    public function getUserId($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->getUserId($params);
+    }
 
+    /**
+     * get User Id - pkTemp
+     * @param array $params
+     * @return array
+     */
+    public function getUserIdTemp($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->getUserIdTemp($params);
+    }
+    
+        /**
+     * New user RrpMap insert function 
+     * @param array | null $params
+     * @return array
+     */
+    public function setNewUserRrpMap($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->setNewUserRrpMap($params);
+    }
+    
 }
 

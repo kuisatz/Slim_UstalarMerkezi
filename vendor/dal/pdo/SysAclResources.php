@@ -18,119 +18,54 @@ namespace DAL\PDO;
  */
 class SysAclResources extends \DAL\DalSlim {
 
-    /**
-     * basic delete from database  example for PDO prepared
-     * statements, table names are irrelevant and should be changed on specific 
-     * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [affectedRowsCount] => 1
-      )
-     * for error result
-     * Array
-      (
-      [found] => 0
-      [errorInfo] => 42P01
-      )
-     * usage
+    /**       
      * @author Okan CIRAN
      * @ sys_acl_resources tablosundan parametre olarak  gelen id kaydını siler. !!
      * @version v 1.0  07.01.2016
-     * @param type $id
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
-    public function delete($id = null, $params = array()) {
-        try {
+    public function delete($params = array()) {
+       try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $pdo->beginTransaction();       
-            $statement = $pdo->prepare(" 
+            $pdo->beginTransaction();
+            $userId = $this->getUserId(array('pk' => $params['pk']));
+            if (\Utill\Dal\Helper::haveRecord($userId)) {
+                $userIdValue = $userId ['resultSet'][0]['user_id'];
+                $statement = $pdo->prepare(" 
                 UPDATE sys_acl_resources
-                SET  deleted= 1, user_id =  " . intval($params['user_id']) . " 
-                WHERE id = :id");         
-            $statement->bindValue(':id', $id, \PDO::PARAM_INT);         
-            $update = $statement->execute();
-            $afterRows = $statement->rowCount();
-            $errorInfo = $statement->errorInfo();
-            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                throw new \PDOException($errorInfo[0]);
-            $pdo->commit();
-            return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $afterRows);
+                SET  deleted= 1 , active = 1 ,
+                     op_user_id = " . $userIdValue . "     
+                WHERE id = :id");
+                //Execute our DELETE statement.
+                $update = $statement->execute();
+                $afterRows = $statement->rowCount();
+                $errorInfo = $statement->errorInfo();
+                if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                    throw new \PDOException($errorInfo[0]);
+                $pdo->commit();
+                return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $afterRows);
+            } else {
+                $errorInfo = '23502';  /// 23502  not_null_violation
+                $pdo->rollback();
+                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '');
+            }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
-    }
+    } 
 
-    /**
-     * basic select from database  example for PDO prepared
-     * statements, table names are irrevelant and should be changed on specific 
-     * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [resultSet] => Array
-      (
-      [0] => Array
-      (
-      [id] => 1
-      [name] => zeyn dag
-      [international_code] => 12
-      [active] => 1
-      )
-
-      [1] => Array
-      (
-      [id] => 4
-      [name] => zeyn dag
-      [international_code] => 12
-      [active] => 1
-      )
-
-      [2] => Array
-      (
-      [id] => 5
-      [name] => zeyn dag new
-      [international_code] => 25
-      [active] => 1
-      )
-
-      [3] => Array
-      (
-      [id] => 3
-      [name] => zeyn zeyn oldu şimdik
-      [international_code] => 12
-      [active] => 1
-      )
-
-      )
-
-      )
-     * usage 
+    /**  
      * @author Okan CIRAN
      * @ sys_acl_resources tablosundaki tüm kayıtları getirir.  !!
      * @version v 1.0  07.01.2016    
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
-    public function getAll() {
+    public function getAll($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $statement = $pdo->prepare("
@@ -151,48 +86,26 @@ class SysAclResources extends \DAL\DalSlim {
                 INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_code = 'tr' AND sd.deleted = 0 AND sd.active = 0
                 INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_code = 'tr' AND sd1.deleted = 0 AND sd1.active = 0                             
                 INNER JOIN info_users u ON u.id = a.user_id    
-                WHERE a.deleted =0 
+                WHERE a.deleted =0 AND a.language_code = :language_code     
                 ORDER BY a.name                  
                                  ");
+            $statement->bindValue(':language_code', $params['language_code'], \PDO::PARAM_STR);             
             $statement->execute();
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);   
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-        } catch (\PDOException $e /* Exception $e */) {
-            $pdo->rollback();
+        } catch (\PDOException $e /* Exception $e */) {     
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
 
-    /**
-     * basic insert database example for PDO prepared
-     * statements, table names are irrevelant and should be changed on specific 
-     * * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [lastInsertId] => 5
-      )
-     * for error result
-     * Array
-      (
-      [found] => 0
-      [errorInfo] => 42P01
-      )
-     * usage     
+    /** 
      * @author Okan CIRAN
      * @ sys_acl_resources tablosuna yeni bir kayıt oluşturur.  !!
      * @version v 1.0  07.01.2016
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
@@ -200,7 +113,7 @@ class SysAclResources extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-                       $kontrol = $this->haveRecords($params); 
+            $kontrol = $this->haveRecords($params); 
             if (!\Utill\Dal\Helper::haveRecord($kontrol)) {            
                 $sql = "
                 INSERT INTO sys_acl_resources(
@@ -218,18 +131,17 @@ class SysAclResources extends \DAL\DalSlim {
                 $statement->bindValue(':parent', $params['parent'], \PDO::PARAM_INT);
                 $statement->bindValue(':user_id', $params['user_id'], \PDO::PARAM_INT);
                 $statement->bindValue(':description', $params['description'], \PDO::PARAM_STR);
-                //echo debugPDO($sql, $params);
+             //   echo debugPDO($sql, $params);
                 $result = $statement->execute();
                 $insertID = $pdo->lastInsertId('sys_acl_resources_id_seq');
                 $errorInfo = $statement->errorInfo();
                 if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                     throw new \PDOException($errorInfo[0]);
                 $pdo->commit();
-
                 return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);
             } else {  
                 $errorInfo = '23505'; 
-                $pdo->commit();
+                 $pdo->rollback();
                 $result= $kontrol;                            
                 return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '');
             }
@@ -239,38 +151,15 @@ class SysAclResources extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * basic update database example for PDO prepared
-     * statements, table names are irrevelant and should be changed on specific
-     * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [affectedRowsCount] => 1
-      )
-     * for error result
-     * Array
-      (
-      [found] => 0
-      [errorInfo] => 42P01
-      )
-     * usage  
+    /**    
      * @author Okan CIRAN
      * sys_acl_resources tablosuna parametre olarak gelen id deki kaydın bilgilerini günceller   !!
      * @version v 1.0  07.01.2016
-     * @param type $id
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
-    public function update($id = null, $params = array()) {
+    public function update($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
@@ -302,7 +191,7 @@ class SysAclResources extends \DAL\DalSlim {
             return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $affectedRows);
         } else { 
                 $errorInfo = '23505';
-                $pdo->commit();
+                 $pdo->rollback();
                 $result= $kontrol;
                 return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '');
             }
@@ -313,14 +202,11 @@ class SysAclResources extends \DAL\DalSlim {
         }
     }
     
-    /**
-     * basic have records control  
-     * * returned result set example;
-     * for success result  
-     * usage     
+    /**     
      * @author Okan CIRAN
      * @ sys_acl_roles tablosunda name sutununda daha önce oluşturulmuş mu? 
      * @version v 1.0 15.01.2016
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
@@ -343,7 +229,7 @@ class SysAclResources extends \DAL\DalSlim {
                AND deleted =0   
                                ";
             $statement = $pdo->prepare($sql);        
-         //   echo debugPDO($sql, $params);
+      //  echo debugPDO($sql, $params);
             $statement->execute();
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             $errorInfo = $statement->errorInfo();
@@ -392,13 +278,8 @@ class SysAclResources extends \DAL\DalSlim {
                 $order = trim($args['order']);
         } else {
             $order = "ASC";
-        }
-        
-        $whereNameSQL = '';
-        if (isset($args['search_name']) && $args['search_name'] != "") {
-            $whereNameSQL = " AND a.name LIKE '%" . $args['search_name'] . "%' ";
-        }
- 
+        }  
+      
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $sql = "                   
@@ -420,7 +301,7 @@ class SysAclResources extends \DAL\DalSlim {
                 INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_code = 'tr' AND sd1.deleted = 0 AND sd1.active = 0                             
                 INNER JOIN info_users u ON u.id = a.user_id    
                 WHERE a.deleted =0  
-                  " . $whereNameSQL . "
+                  " . $whereSQL . "
                 ORDER BY " . $sort . " "
                     . "" . $order . " "
                     . "LIMIT " . $pdo->quote($limit) . " "
@@ -446,7 +327,6 @@ class SysAclResources extends \DAL\DalSlim {
     }
 
     /**
-     * user interface datagrid fill operation get row count for widget
      * @author Okan CIRAN
      * @ Gridi doldurmak için sys_acl_resources tablosundan çekilen kayıtlarının kaç tane olduğunu döndürür   !!
      * @version v 1.0  07.01.2016
@@ -457,14 +337,10 @@ class SysAclResources extends \DAL\DalSlim {
     public function fillGridRowTotalCount($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $whereNameSQL = '';
-            $whereNameSQL1 = '';
-            $whereNameSQL2 = '';
-            if (isset($params['search_name']) && $params['search_name'] != "") {
-                $whereNameSQL = " WHERE a.name LIKE '%" . $params['search_name'] . "%' ";
-                $whereNameSQL1 = " AND a1.name LIKE '%" . $params['search_name'] . "%' ";
-                $whereNameSQL2 = " AND a2.name LIKE '%" . $params['search_name'] . "%' ";
-            }
+            $whereSQL = '';
+            $whereSQL1 = ' WHERE a1.deleted =0 ';
+            $whereSQL2 = ' WHERE a2.deleted =1 ';
+            
             $sql = "
                 SELECT 
                     COUNT(a.id) AS COUNT ,
@@ -472,17 +348,17 @@ class SysAclResources extends \DAL\DalSlim {
                     INNER JOIN sys_specific_definitions sd1x ON sd1x.main_group = 15 AND sd1x.first_group= a1.deleted AND sd1x.language_code = 'tr' AND sd1x.deleted = 0 AND sd1x.active = 0
                     INNER JOIN sys_specific_definitions sd11 ON sd11.main_group = 16 AND sd11.first_group= a1.active AND sd11.language_code = 'tr' AND sd11.deleted = 0 AND sd11.active = 0                             
                     INNER JOIN info_users u1 ON u1.id = a1.user_id 
-                    WHERE a1.deleted =0 " . $whereNameSQL1 . " ) AS undeleted_count, 
+                     " . $whereSQL1 . " ) AS undeleted_count, 
                     (SELECT COUNT(a2.id) FROM sys_acl_resources a2
                     INNER JOIN sys_specific_definitions sd2 ON sd2.main_group = 15 AND sd2.first_group= a2.deleted AND sd2.language_code = 'tr' AND sd2.deleted = 0 AND sd2.active = 0
                     INNER JOIN sys_specific_definitions sd12 ON sd12.main_group = 16 AND sd12.first_group= a2.active AND sd12.language_code = 'tr' AND sd12.deleted = 0 AND sd12.active = 0                             
                     INNER JOIN info_users u2 ON u2.id = a2.user_id 			
-                    WHERE a2.deleted =1 " . $whereNameSQL2 . " ) AS deleted_count                        
+                    " . $whereSQL2 . " ) AS deleted_count                        
                 FROM sys_acl_resources a
                 INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_code = 'tr' AND sd.deleted = 0 AND sd.active = 0
                 INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_code = 'tr' AND sd1.deleted = 0 AND sd1.active = 0                             
                 INNER JOIN info_users u ON u.id = a.user_id 
-                " . $whereNameSQL . "
+                " . $whereSQL . "
                     ";
             $statement = $pdo->prepare($sql);
             $statement->execute();
@@ -524,19 +400,16 @@ class SysAclResources extends \DAL\DalSlim {
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-        } catch (\PDOException $e /* Exception $e */) {
-            $pdo->rollback();
+        } catch (\PDOException $e /* Exception $e */) {         
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
 
-    /**
-     * Combobox fill function used for testing
-     * user interface combobox fill operation   
+    /**    
      * @author Okan CIRAN
      * @ combobox doldurmak için sys_acl_resources tablosundan tüm kayıtları döndürür !!
      * @version v 1.0  07.01.2016
-     * @param array | null $args
+     * @param array $params
      * @return array
      * @throws \PDOException
      */
@@ -544,14 +417,18 @@ class SysAclResources extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $id = 0;
-            if (isset($_GET['id']) && $_GET['id'] != "") {
-                $id = $_GET['id'];
+            if (isset($params['id']) && $params['id'] != "") {
+                $id = $params['id'];
             }
             $statement = $pdo->prepare("
                 SELECT                    
                     a.id, 	
-                    a.name AS name ,
-                    a.active
+                    a.name AS name  ,
+                    CASE 
+                        (SELECT DISTINCT 1 state_type FROM sys_acl_resources WHERE parent = a.id AND deleted = 0)    
+                    WHEN 1 THEN 'closed'
+                    ELSE 'open'   
+                    END AS state_type  
                 FROM sys_acl_resources a       
                 WHERE                    
                     a.parent = " . $id . " AND 
@@ -564,8 +441,7 @@ class SysAclResources extends \DAL\DalSlim {
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-        } catch (\PDOException $e /* Exception $e */) {
-            $pdo->rollback();
+        } catch (\PDOException $e /* Exception $e */) {        
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }

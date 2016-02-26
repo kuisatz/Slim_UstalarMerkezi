@@ -18,131 +18,57 @@ namespace DAL\PDO;
  */
 class SysLanguage extends \DAL\DalSlim {
 
-    /**
-     * basic delete from database  example for PDO prepared
-     * statements, table names are irrelevant and should be changed on specific 
-     * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [affectedRowsCount] => 1
-      )
-     * for error result
-     * Array
-      (
-      [found] => 0
-      [errorInfo] => 42P01
-      )
-     * usage
+    /**     
      * @author Okan CIRAN
      * @ sys_language tablosundan parametre olarak  gelen id kaydını siler. !!
      * @version v 1.0  07.12.2015
-     * @param type $id
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
-    public function delete($id = null) {
+    public function delete($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-            /**
-             * table names and  column names will be changed for specific use
-             */
-            //Prepare our UPDATE SQL statement. 
-            $statement = $pdo->prepare(" 
+            $userId = $this->getUserId(array('pk' => $params['pk']));
+            if (\Utill\Dal\Helper::haveRecord($userId)) {
+                $userIdValue = $userId ['resultSet'][0]['user_id'];
+                $statement = $pdo->prepare(" 
                 UPDATE sys_language
-                SET  deleted= 1
+                SET  deleted= 1 , active = 1 ,
+                     op_user_id = " . $userIdValue . "     
                 WHERE id = :id");
-            //Bind our value to the parameter :id.
-            $statement->bindValue(':id', $id, \PDO::PARAM_INT);
-            //Execute our DELETE statement.
-            $update = $statement->execute();
-            $afterRows = $statement->rowCount();
-            $errorInfo = $statement->errorInfo();
-
-            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                throw new \PDOException($errorInfo[0]);
-            $pdo->commit();
-            return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $afterRows);
+                //Execute our DELETE statement.
+                $update = $statement->execute();
+                $afterRows = $statement->rowCount();
+                $errorInfo = $statement->errorInfo();
+                if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                    throw new \PDOException($errorInfo[0]);
+                $pdo->commit();
+                return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $afterRows);
+            } else {
+                $errorInfo = '23502';  /// 23502  not_null_violation
+                $pdo->rollback();
+                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '');
+            }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
-    }
+    } 
 
-    /**
-     * basic select from database  example for PDO prepared
-     * statements, table names are irrevelant and should be changed on specific 
-     * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
 
-      [resultSet] => Array
-      (
-      [0] => Array
-      (
-      [id] => 1
-      [name] => zeyn dag
-      [international_code] => 12
-      [active] => 1
-      )
-
-      [1] => Array
-      (
-      [id] => 4
-      [name] => zeyn dag
-      [international_code] => 12
-      [active] => 1
-      )
-
-      [2] => Array
-      (
-      [id] => 5
-      [name] => zeyn dag new
-      [international_code] => 25
-      [active] => 1
-      )
-
-      [3] => Array
-      (
-      [id] => 3
-      [name] => zeyn zeyn oldu şimdik
-      [international_code] => 12
-      [active] => 1
-      )
-
-      )
-
-      )
-     * usage 
+    /**      
      * @author Okan CIRAN
      * @ sys_language tablosundaki tüm kayıtları getirir.  !!
      * @version v 1.0  07.12.2015    
+     * @param array | null $params
      * @return array
      * @throws \PDOException
      */
-    public function getAll() {
+    public function getAll($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            /**
-             * table names and column names will be changed for specific use
-             */
             $statement = $pdo->prepare("
                   SELECT                    
                     a.id, 
@@ -174,48 +100,20 @@ class SysLanguage extends \DAL\DalSlim {
 			sd1.language_id = a.language_id AND sd1.deleted = 0 AND sd1.active = 0
                 INNER JOIN sys_language l ON l.id = a.language_id AND l.deleted =0 AND l.active = 0 
 		INNER JOIN info_users u ON u.id = a.user_id  
-                ORDER BY a.priority, language 
-                
+                ORDER BY a.priority, language                 
                                  ");
             $statement->execute();
-            $result = $statement->fetcAll(\PDO::FETCH_ASSOC);
-            /* while ($row = $statement->fetch()) {
-              print_r($row);
-              } */
+            $result = $statement->fetcAll(\PDO::FETCH_ASSOC); 
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-        } catch (\PDOException $e /* Exception $e */) {
-            $pdo->rollback();
+        } catch (\PDOException $e /* Exception $e */) {          
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
 
-    /**
-     * basic insert database example for PDO prepared
-     * statements, table names are irrevelant and should be changed on specific 
-     * * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [lastInsertId] => 5
-      )
-     * for error result
-     * Array
-      (
-      [found] => 0
-      [errorInfo] => 42P01
-      )
-     * usage     
+    /**      
      * @author Okan CIRAN
      * @ sys_language tablosuna yeni bir kayıt oluşturur.  !!
      * @version v 1.0  08.12.2015
@@ -236,11 +134,9 @@ class SysLanguage extends \DAL\DalSlim {
                                ";
             $statement = $pdo->prepare($sql);            
             $statement->execute();
-            $kontrol = $statement->fetchAll(\PDO::FETCH_ASSOC);          
+            $kontrol = $statement->fetchAll(\PDO::FETCH_ASSOC);         
 
             if (!isset($kontrol[0]['control'])) {  
-                
-         
             $pdo->beginTransaction();
             /**
              * table names and column names will be changed for specific use
@@ -275,30 +171,23 @@ class SysLanguage extends \DAL\DalSlim {
             $statement->bindValue(':icon_road', $params['icon_road'], \PDO::PARAM_STR);
             $statement->bindValue(':user_id', $params['user_id'], \PDO::PARAM_STR);
             $statement->bindValue(':country_code3', $params['country_code3'], \PDO::PARAM_STR);
-            $statement->bindValue(':link', $params['link'], \PDO::PARAM_STR);
-            
+            $statement->bindValue(':link', $params['link'], \PDO::PARAM_STR);            
             $statement->bindValue(':language_code', $params['language_code'], \PDO::PARAM_INT);
             $statement->bindValue(':language_id', $params['language_id'], \PDO::PARAM_INT);
             $statement->bindValue(':parent_id', $params['parent_id'], \PDO::PARAM_INT);
             $statement->bindValue(':language_eng', $params['language_eng'], \PDO::PARAM_STR);
             $statement->bindValue(':language_main_code', $params['language_main_code'], \PDO::PARAM_STR);
             $statement->bindValue(':language', $params['language'], \PDO::PARAM_STR);
-            $statement->bindValue(':priority', $params['priority'], \PDO::PARAM_INT);
-                        
-
+            $statement->bindValue(':priority', $params['priority'], \PDO::PARAM_INT);  
             $result = $statement->execute();
-
             $insertID = $pdo->lastInsertId('sys_language_id_seq');
-
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             $pdo->commit();
-
-            return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);
-           
+            return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);           
             } else {           
-                $result  = $kontrol;             
+               // $result  = $kontrol;             
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -306,46 +195,18 @@ class SysLanguage extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * basic update database example for PDO prepared
-     * statements, table names are irrevelant and should be changed on specific
-     * returned result set example;
-     * for success result
-     * Array
-      (
-      [found] => 1
-      [errorInfo] => Array
-      (
-      [0] => 00000
-      [1] =>
-      [2] =>
-      )
-
-      [affectedRowsCount] => 1
-      )
-     * for error result
-     * Array
-      (
-      [found] => 0
-      [errorInfo] => 42P01
-      )
-     * usage  
+    /**    
      * @author Okan CIRAN
      * sys_language tablosuna parametre olarak gelen id deki kaydın bilgilerini günceller   !!
      * @version v 1.0  07.12.2015
-     * @param type $id
+     * @param type $params
      * @return array
      * @throws \PDOException
      */
-    public function update($id = null, $params = array()) {
+    public function update($params = array()) {
         try {
-
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $pdo->beginTransaction();
-            /**
-             * table names and  column names will be changed for specific use
-             */
-            //Prepare our UPDATE SQL statement.            
+            $pdo->beginTransaction();          
             $statement = $pdo->prepare("
                 UPDATE sys_language
                 SET              
@@ -366,7 +227,7 @@ class SysLanguage extends \DAL\DalSlim {
                     priority  = :priority
                 WHERE id = :id");
             //Bind our value to the parameter :id.
-            $statement->bindValue(':id', $id, \PDO::PARAM_INT);
+            $statement->bindValue(':id',  $params['id'], \PDO::PARAM_INT);
             //Bind our :model parameter.     
             $statement->bindValue(':country_name', $params['country_name'], \PDO::PARAM_STR);
             $statement->bindValue(':country_name_eng', $params['country_name_eng'], \PDO::PARAM_STR);
@@ -375,17 +236,14 @@ class SysLanguage extends \DAL\DalSlim {
             $statement->bindValue(':icon_road', $params['icon_road'], \PDO::PARAM_STR);
             $statement->bindValue(':user_id', $params['user_id'], \PDO::PARAM_STR);
             $statement->bindValue(':country_code3', $params['country_code3'], \PDO::PARAM_STR);
-            $statement->bindValue(':link', $params['link'], \PDO::PARAM_STR);
-            
+            $statement->bindValue(':link', $params['link'], \PDO::PARAM_STR);            
             $statement->bindValue(':language_code', $params['language_code'], \PDO::PARAM_INT);
             $statement->bindValue(':language_id', $params['language_id'], \PDO::PARAM_INT);
             $statement->bindValue(':parent_id', $params['parent_id'], \PDO::PARAM_INT);
             $statement->bindValue(':language_eng', $params['language_eng'], \PDO::PARAM_STR);
             $statement->bindValue(':language_main_code', $params['language_main_code'], \PDO::PARAM_STR);
             $statement->bindValue(':language', $params['language'], \PDO::PARAM_STR);
-            $statement->bindValue(':priority', $params['priority'], \PDO::PARAM_INT);
-            
-            
+            $statement->bindValue(':priority', $params['priority'], \PDO::PARAM_INT);           
             //Execute our UPDATE statement.
             $update = $statement->execute(); 
             $affectedRows = $statement->rowCount();
@@ -426,22 +284,18 @@ class SysLanguage extends \DAL\DalSlim {
             $sortArr = explode(",", $sort);
             if (count($sortArr) === 1)
                 $sort = trim($args['sort']);
-        } else {
-            //$sort = "id";
-            $sort = "r_date";
+        } else { 
+            $sort = " a.priority, language";
         }
 
         if (isset($args['order']) && $args['order'] != "") {
             $order = trim($args['order']);
-            $orderArr = explode(",", $order);
-            //print_r($orderArr);
+            $orderArr = explode(",", $order);    
             if (count($orderArr) === 1)
                 $order = trim($args['order']);
-        } else {
-            //$order = "desc";
+        } else {     
             $order = "ASC";
         }        
-
 
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
@@ -481,11 +335,7 @@ class SysLanguage extends \DAL\DalSlim {
                     . "" . $order . " "
                     . "LIMIT " . $pdo->quote($limit) . " "
                     . "OFFSET " . $pdo->quote($offset) . " ";
-            $statement = $pdo->prepare($sql);
-            /**
-             * For debug purposes PDO statement sql
-             * uses 'Panique' library located in vendor directory
-             */
+            $statement = $pdo->prepare($sql); 
             $parameters = array(
                 'sort' => $sort,
                 'order' => $order,
@@ -497,7 +347,6 @@ class SysLanguage extends \DAL\DalSlim {
             $statement->execute();
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             $errorInfo = $statement->errorInfo();
-
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
@@ -518,10 +367,8 @@ class SysLanguage extends \DAL\DalSlim {
      */
     public function fillGridRowTotalCount($params = array()) {
         try {
-
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $sql = "
-             
+            $sql = "             
 	     SELECT                    
 			COUNT(a.id) AS COUNT , 
 			(SELECT COUNT(a1.id) FROM sys_language a1
@@ -553,7 +400,6 @@ class SysLanguage extends \DAL\DalSlim {
             $statement->bindValue(':language_id', $args['language_id'], \PDO::PARAM_INT);
             $statement->execute();
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
@@ -563,7 +409,7 @@ class SysLanguage extends \DAL\DalSlim {
             return array("found" => false, "errorInfo" => $e->getMessage()/* , 'debug' => $debugSQLParams */);
         }
     }
-      /**
+    /**
      * user interface datagrid fill operation get row count for widget
      * @author Okan CIRAN
      * @ combobox ı doldurmak için sys_language tablosundan çekilen kayıtları döndürür   !!
@@ -572,12 +418,9 @@ class SysLanguage extends \DAL\DalSlim {
      * @return array
      * @throws \PDOException
      */
-     public function fillComboBox() {
+    public function fillComboBox() {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            /**
-             * table names and column names will be changed for specific use
-             */
             $statement = $pdo->prepare("
                 SELECT                    
                     a.id, 	
@@ -587,25 +430,51 @@ class SysLanguage extends \DAL\DalSlim {
                 FROM sys_language  a       
                 WHERE  
                     a.deleted = 0 and a.active =0    
-                ORDER BY a.priority
-                
+                ORDER BY a.priority                
                                  ");
               $statement->execute();
-            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
-            
-            /* while ($row = $statement->fetch()) {
-              print_r($row);
-              } */
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC);                        
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-        } catch (\PDOException $e /* Exception $e */) {
-            $pdo->rollback();
+        } catch (\PDOException $e /* Exception $e */) {      
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
     
+     /**     
+     * @author Okan CIRAN
+     * @ sys_language tablosundan id degerini getirir.  !!
+     * @version v 1.0  03.02.2016    
+     * @param array | null $params
+     * @return array
+     * @throws \PDOException
+     */
+    public function getLanguageId($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
+            $sql = "     
+                SELECT                    
+                    a.id   ,
+                    a.language_main_code ='" . $params['language_code'] . "'  as control
+                FROM sys_language a                                
+                where a.deleted =0 AND a.active = 0 AND 
+                    a.language_main_code = '" . $params['language_code'] . "'               
+                LIMIT 1                ";
+           //  echo debugPDO($sql, $params);   
+            $statement = $pdo->prepare($sql);
+            $statement->execute();
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC); 
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {            
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+
     
 
 }

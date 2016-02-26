@@ -53,11 +53,23 @@ class DalManagerConfig {
                 'sysAclResourcesPDO' => 'DAL\Factory\PDO\SysAclResourcesFactory',   
                 'sysAclPrivilegePDO' => 'DAL\Factory\PDO\SysAclPrivilegeFactory',   
                 'sysAclRrpMapPDO' => 'DAL\Factory\PDO\SysAclRrpMapFactory',  
+                'sysSpecificDefinitionsPDO' => 'DAL\Factory\PDO\SysSpecificDefinitionsFactory', 
+                'infoUsersCommunicationsPDO' => 'DAL\Factory\PDO\InfoUsersCommunicationsFactory', 
+                'infoUsersAddressesPDO' => 'DAL\Factory\PDO\InfoUsersAddressesFactory', 
+                'blActivationReportPDO' => 'DAL\Factory\PDO\BlActivationReportFactory', 
+                'sysOsbConsultantsPDO' => 'DAL\Factory\PDO\SysOsbConsultantsFactory', 
+                'sysOsbPDO' => 'DAL\Factory\PDO\SysOsbFactory', 
+                'sysOperationTypesPDO' => 'DAL\Factory\PDO\SysOperationTypesFactory',
+                'sysOperationTypesToolsPDO' => 'DAL\Factory\PDO\SysOperationTypesToolsFactory', 
+                'infoErrorPDO' => 'DAL\Factory\PDO\InfoErrorFactory', 
+                'sysMachineToolGroupsPDO' => 'DAL\Factory\PDO\SysMachineToolGroupsFactory', 
+                'sysMachineToolsPDO' => 'DAL\Factory\PDO\SysMachineToolsFactory',
+                'sysMachineToolPropertyDefinitionPDO' => 'DAL\Factory\PDO\SysMachineToolPropertyDefinitionFactory',
+                'sysMachineToolPropertiesPDO' => 'DAL\Factory\PDO\SysMachineToolPropertiesFactory',
+                'sysUnitsPDO' => 'DAL\Factory\PDO\SysUnitsFactory',
+                'infoFirmMachineToolPDO' => 'DAL\Factory\PDO\InfoFirmMachineToolFactory',
                 
-                
-                
-                
-                
+                  
             ],
         ),
     );

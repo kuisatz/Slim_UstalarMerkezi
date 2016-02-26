@@ -33,6 +33,7 @@ return array(
     'Services\\Database\\' => array($vendorDir . '/services/database'),
     'Services\\Database\\Postgresql\\' => array($vendorDir . '/services/database/postgresql'),
     'Services\\Filter\\' => array($vendorDir . '/services/filter'),
+    'Services\\Filter\\Helper\\' => array($vendorDir . '/services/filter/helper'),
     'Services\\Validator\\' => array($vendorDir . '/services/validator'),
     'Services\\' => array($vendorDir . '/services'),
     'Services\\Messager\\' => array($vendorDir . '/services/messager'),
@@ -58,4 +59,8 @@ return array(
     'Utill\\Validation\\' => array($vendorDir . '/utill/validation'),
     'Utill\\Validation\\Chain\\' => array($vendorDir . '/utill/validation/chain'),
     'Utill\\Dal\\' => array($vendorDir . '/utill/dal'),
+    'Utill\\Factories\\' => array($vendorDir . '/utill/factories'),
+    'Utill\\Factories\\ResulSetHelpers\\' => array($vendorDir . '/utill/factories/resultsethelpers'),
+    'Utill\\Helpers\\' => array($vendorDir . '/utill/helpers'),
+    'Utill\\Helpers\\ResulSetHelpers\\' => array($vendorDir . '/utill/helpers/resultsethelpers'),
 );

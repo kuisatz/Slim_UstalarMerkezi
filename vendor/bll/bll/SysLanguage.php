@@ -32,33 +32,33 @@ class SysLanguage extends \BLL\BLLSlim{
     }
     
     /**
-     * Data update function
-     * @param integer $id
-     * @param array | null $params
+     * Data update function 
+     * @param array  $params
      * @return array
      */
-    public function update($id = null, $params = array()) {
+    public function update( $params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
-        return $DAL->update($id, $params);
+        return $DAL->update( $params);
     }
     
     /**
      * Data delete function
-     * @param integer $id
+     * @param array  $params
      * @return array
      */
-    public function delete($id = null) {
+    public function delete( $params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
-        return $DAL->delete($id);
+        return $DAL->delete($params);
     }
 
     /**
      * get all data
+     * @param array  $params
      * @return array
      */
-    public function getAll() {
+    public function getAll($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
-        return $DAL->getAll();
+        return $DAL->getAll($params);
     }
     
     /**
@@ -89,5 +89,14 @@ class SysLanguage extends \BLL\BLLSlim{
         $resultSet = $DAL->fillComboBox();  
         return $resultSet['resultSet'];
     }
+    
+    public function getLanguageId() {
+        $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
+        $resultSet = $DAL->getLanguageId();  
+        return $resultSet['resultSet'];
+    }
+    
+    
+    
 }
 

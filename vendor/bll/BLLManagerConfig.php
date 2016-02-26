@@ -47,14 +47,25 @@ class BLLManagerConfig{
                  'sysAclRolesBLL' => 'BLL\BLL\SysAclRoles',
                  'sysAclResourcesBLL' => 'BLL\BLL\SysAclResources',
                  'sysAclPrivilegeBLL' => 'BLL\BLL\SysAclPrivilege',
-                 'sysAclRrpMapBLL' => 'BLL\BLL\SysAclRrpMap',               
+                 'sysAclRrpMapBLL' => 'BLL\BLL\SysAclRrpMap',  
+                 'sysSpecificDefinitionsBLL' => 'BLL\BLL\SysSpecificDefinitions',   
+                 'infoUsersCommunicationsBLL' => 'BLL\BLL\InfoUsersCommunications',   
+                 'infoUsersAddressesBLL' => 'BLL\BLL\InfoUsersAddresses',   
+                 'blActivationReportBLL' => 'BLL\BLL\BlActivationReport',
+                 'sysOsbConsultantsBLL' => 'BLL\BLL\SysOsbConsultants',                 
+                 'sysOsbBLL' => 'BLL\BLL\SysOsb',
+                 'sysOperationTypesBLL' => 'BLL\BLL\SysOperationTypes',
+                 'sysOperationTypesToolsBLL' => 'BLL\BLL\SysOperationTypesTools',
+                 'infoErrorBLL' => 'BLL\BLL\InfoError',
+                 'sysMachineToolGroupsBLL' => 'BLL\BLL\SysMachineToolGroups',
+                 'sysMachineToolsBLL' => 'BLL\BLL\SysMachineTools',
+                 'sysMachineToolPropertyDefinitionBLL' => 'BLL\BLL\SysMachineToolPropertyDefinition',
+                 'sysMachineToolPropertiesBLL' => 'BLL\BLL\SysMachineToolProperties',
+                 'sysUnitsBLL' => 'BLL\BLL\SysUnits',
+                 'infoFirmMachineToolBLL' => 'BLL\BLL\InfoFirmMachineTool',
                  
-                 
-               
-            
-                   
-                 
-                 
+              
+                                  
              ),
              'factories' => [
                  //'reportConfigurationPDO' => 'BLL\BLL\ReportConfiguration',
