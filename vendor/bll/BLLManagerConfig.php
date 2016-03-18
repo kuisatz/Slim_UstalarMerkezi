@@ -63,9 +63,24 @@ class BLLManagerConfig{
                  'sysMachineToolPropertiesBLL' => 'BLL\BLL\SysMachineToolProperties',
                  'sysUnitsBLL' => 'BLL\BLL\SysUnits',
                  'infoFirmMachineToolBLL' => 'BLL\BLL\InfoFirmMachineTool',
+                 'sysNaceCodesBLL' => 'BLL\BLL\SysNaceCodes',
+                 'hstryLoginBLL' => 'BLL\BLL\HstryLogin',              
+                 'blAdminActivationReportBLL' => 'BLL\BLL\BlAdminActivationReport',  
+                 'sysUnspscCodesBLL' => 'BLL\BLL\SysUnspscCodes',                   
                  
-              
-                                  
+                 
+                 
+                 
+                 'logConnectionBLL' => 'BLL\BLL\LogConnection',  
+                 'logUserBLL' => 'BLL\BLL\LogUser',
+                 'logConsultantBLL' => 'BLL\BLL\LogConsultant',
+                 'logAdminBLL' => 'BLL\BLL\LogAdmin',
+                 
+               
+                 
+                 
+                 
+                 
              ),
              'factories' => [
                  //'reportConfigurationPDO' => 'BLL\BLL\ReportConfiguration',

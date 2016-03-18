@@ -109,7 +109,8 @@ class InfoFirmProfile extends \DAL\DalSlim {
                         a.description_eng,
                         a.duns_number,
                         a.owner_user_id,
-                        own.username as owner_username  
+                        own.username as owner_username ,
+                        a.guidance_consultant_id
                     FROM info_firm_profile a    
                     INNER JOIN sys_operation_types op ON op.id = a.operation_type_id and  op.language_id = a.language_id  AND op.deleted =0 AND op.active =0
                     INNER JOIN sys_specific_definitions sd ON sd.main_group = 13 AND sd.language_id = a.language_id AND a.auth_allow_id = sd.first_group AND sd.deleted =0 AND sd.active =0
@@ -242,7 +243,7 @@ class InfoFirmProfile extends \DAL\DalSlim {
                     }
 
                     $getConsultant = SysOsbConsultants::getConsultantIdForCompany(array('category_id' => 1));
-                    if (\Utill\Dal\Helper::haveRecord($getConsultant['resultSet'][0]['consultant_id'])) {
+                    if (\Utill\Dal\Helper::haveRecord($getConsultant)) {
                         $ConsultantId = $getConsultant ['resultSet'][0]['consultant_id'];
                     } else {
                         $ConsultantId = 1001;
@@ -273,6 +274,16 @@ class InfoFirmProfile extends \DAL\DalSlim {
                     }
                     $addSql .= " language_id, ";
                     $addSqlValue .= " " . $languageIdValue . ",";
+                 
+                    /*
+                    $countryCode = SysCountrys::getCountryCode(array('country_id' => $params['country_id']));
+                    if (\Utill\Dal\Helper::haveRecord($countryCode)) {
+                        $countryCodeValue = $countryCode ['resultSet'][0]['country_code'];
+                    } else {
+                        $countryCodeValue = 'AN';
+                    }
+                     */
+                   
 
                     $statement = $pdo->prepare("
                    INSERT INTO info_firm_profile(

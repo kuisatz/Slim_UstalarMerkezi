@@ -68,8 +68,20 @@ class DalManagerConfig {
                 'sysMachineToolPropertiesPDO' => 'DAL\Factory\PDO\SysMachineToolPropertiesFactory',
                 'sysUnitsPDO' => 'DAL\Factory\PDO\SysUnitsFactory',
                 'infoFirmMachineToolPDO' => 'DAL\Factory\PDO\InfoFirmMachineToolFactory',
+                'sysNaceCodesPDO' => 'DAL\Factory\PDO\SysNaceCodesFactory',
+                'hstryLoginPDO' => 'DAL\Factory\PDO\HstryLoginFactory',
+                'blAdminActivationReportPDO' => 'DAL\Factory\PDO\BlAdminActivationReportFactory',
+                'sysUnspscCodesPDO' => 'DAL\Factory\PDO\SysUnspscCodesFactory',                  
+                 
                 
-                  
+                
+                'logConnectionPDO' => 'DAL\Factory\PDO\LogConnectionFactory',
+                'logUserPDO' => 'DAL\Factory\PDO\LogUserFactory',
+                'logConsultantPDO' => 'DAL\Factory\PDO\LogConsultantFactory',
+                'logConsultantPDO' => 'DAL\Factory\PDO\LogConsultantFactory',
+                'logAdminPDO' => 'DAL\Factory\PDO\LogAdminFactory',
+                
+                
             ],
         ),
     );

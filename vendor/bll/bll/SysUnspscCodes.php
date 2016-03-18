@@ -13,7 +13,7 @@ namespace BLL\BLL;
 /**
  * Business Layer class for report Configuration entity
  */
-class SysMachineToolGroups extends \BLL\BLLSlim {
+class SysUnspscCodes extends \BLL\BLLSlim {
 
     /**
      * constructor
@@ -28,7 +28,7 @@ class SysMachineToolGroups extends \BLL\BLLSlim {
      * @return array
      */
     public function insert($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
         return $DAL->insert($params);
     }
 
@@ -38,7 +38,7 @@ class SysMachineToolGroups extends \BLL\BLLSlim {
      * @return array
      */
     public function update($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
         return $DAL->update($params);
     }
 
@@ -48,7 +48,7 @@ class SysMachineToolGroups extends \BLL\BLLSlim {
      * @return array
      */
     public function delete($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
         return $DAL->delete($params);
     }
 
@@ -58,7 +58,7 @@ class SysMachineToolGroups extends \BLL\BLLSlim {
      * @return array
      */
     public function getAll($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
         return $DAL->getAll($params);
     }
 
@@ -69,7 +69,7 @@ class SysMachineToolGroups extends \BLL\BLLSlim {
      */
     public function fillGrid($params = array()) {
 
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
         $resultSet = $DAL->fillGrid($params);
         return $resultSet['resultSet'];
     }
@@ -80,57 +80,44 @@ class SysMachineToolGroups extends \BLL\BLLSlim {
      * @return array
      */
     public function fillGridRowTotalCount($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
         $resultSet = $DAL->fillGridRowTotalCount($params);
         return $resultSet['resultSet'];
     }
 
+      /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function getUnspscCodes($params = array()) {
+
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
+        $resultSet = $DAL->getUnspscCodes($params);
+        return $resultSet['resultSet'];
+    }
+
   
-
-    /**
+ 
+       /**
      * Function to fill text on user interface layer
      * @param array $params
      * @return array
      */
-    public function fillMachineToolGroups($params = array()) {
-
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');        
-         if (isset($params['parent_id']) && ($params['parent_id'] == 0))  { 
-            $resultSet = $DAL->fillMachineToolGroups($params);
-        } else {            
-            if (isset($params['state']) && ($params['state'] == "closed") && 
-                isset($params['last_node']) && ($params['last_node'] == "true") &&   
-                isset($params['machine']) && $params['machine'] == "false" )  
-            {            
-                $resultSet = $DAL->fillMachineToolGroupsMachines($params);
-            } else {                        
-                $resultSet = $DAL->fillMachineToolGroups($params);                
-            }
-        }        
-        return $resultSet['resultSet'];
+    public function fillUnspscCodesTree($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');     
+        return $DAL->fillUnspscCodesTree($params);
     }
-  /**
-     * Function to fill text on user interface layer
+        /**
+     * Function to get datagrid row count on user interface layer
      * @param array $params
      * @return array
      */
-    public function fillJustMachineToolGroups($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');
-        $resultSet = $DAL->fillJustMachineToolGroups($params);
+    public function fillUnspscCodesTreeRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysUnspscCodesPDO');
+        $resultSet = $DAL->fillUnspscCodesTreeRtc($params);
         return $resultSet['resultSet'];
     }
 
-    /**
-     * Function to fill text on user interface layer
-     * @param array $params
-     * @return array
-     */      
-    public function fillMachineToolGroupsMachineProperties($params = array()) {        
-        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolGroupsPDO');     
-        return $DAL->fillMachineToolGroupsMachineProperties($params);
-    }
-    
-    
-    
     
 }

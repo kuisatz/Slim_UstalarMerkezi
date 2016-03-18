@@ -493,4 +493,39 @@ class SysCountrys extends \DAL\DalSlim {
     }
 
 
+         /**     
+     * @author Okan CIRAN
+     * @ sys_countrys tablosundan id degerini getirir.  !!
+     * @version v 1.0  17.03.2016    
+     * @param array | null $params
+     * @return array
+     * @throws \PDOException
+     */
+    public function getCountryCode($params = array()) {
+        try {
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
+            $sql = " 
+                SELECT                    
+                   a.country_code3 AS country_code,
+                   a.id = " . intval($params['language_code']) . " AS control
+                FROM sys_countrys a                                
+                where a.deleted =0 AND a.active = 0 AND 
+                    a.id = " . intval($params['language_code']) . "
+                LIMIT 1                  
+                ";
+           //  echo debugPDO($sql, $params);   
+            $statement = $pdo->prepare($sql);
+            $statement->execute();
+            $result = $statement->fetchAll(\PDO::FETCH_ASSOC); 
+            $errorInfo = $statement->errorInfo();
+            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
+                throw new \PDOException($errorInfo[0]);
+            return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
+        } catch (\PDOException $e /* Exception $e */) {            
+            return array("found" => false, "errorInfo" => $e->getMessage());
+        }
+    }
+
+    
+    
 }

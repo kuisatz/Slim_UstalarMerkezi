@@ -16,12 +16,12 @@ namespace DAL\PDO;
  * @
  * @author Okan CİRANĞ
  */
-class BlActivationReport extends \DAL\DalSlim {
+class BlAdminActivationReport extends \DAL\DalSlim {
 
     /**    
      * @author Okan CIRAN
      * @ sys_activation_report tablosundan parametre olarak  gelen id kaydını siler. !!
-     * @version v 1.0  04.02.2016
+     * @version v 1.0  08.03.2016
      * @param array | null $args
      * @return array
      * @throws \PDOException
@@ -37,7 +37,7 @@ class BlActivationReport extends \DAL\DalSlim {
      * statements, table names are irrevelant and should be changed on specific 
      * @author Okan CIRAN
      * @ sys_activation_report tablosundaki tüm kayıtları getirir.  !!
-     * @version v 1.0  04.02.2016  
+     * @version v 1.0  08.03.2016  
      * @param array | null $args  
      * @return array
      * @throws \PDOException
@@ -85,50 +85,13 @@ class BlActivationReport extends \DAL\DalSlim {
      * statements, table names are irrevelant and should be changed on specific 
      * @author Okan CIRAN
      * @ sys_activation_report tablosuna yeni bir kayıt oluşturur.  !!
-     * @version v 1.0  04.02.2016
+     * @version v 1.0  08.03.2016
      * @return array
      * @throws \PDOException
      */
     public function insert($params = array()) {
-        try {
-            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-           // $pdo->beginTransaction();         
-            $statement = $pdo->prepare("
-                INSERT INTO sys_activation_report(
-                        op_user_id, 
-                        operation_type_id,                         
-                        language_id, 
-                        language_code, 
-                        service_name, 
-                        table_name, 
-                        about_id
-                        )
-                VALUES (
-                        :op_user_id, 
-                        :operation_type_id,                         
-                        :language_id, 
-                        :language_code, 
-                        :service_name, 
-                        :table_name, 
-                        :about_id
-                                                ");
-            $statement->bindValue(':op_user_id', $params['op_user_id'], \PDO::PARAM_INT);
-            $statement->bindValue(':operation_type_id', $params['operation_type_id'], \PDO::PARAM_INT);            
-            $statement->bindValue(':language_id', $params['language_id'], \PDO::PARAM_INT);
-            $statement->bindValue(':language_code', $params['language_code'], \PDO::PARAM_STR);
-            $statement->bindValue(':service_name', $params['service_name'], \PDO::PARAM_STR);
-            $statement->bindValue(':table_name', $params['table_name'], \PDO::PARAM_STR);
-            $statement->bindValue(':about_id', $params['about_id'], \PDO::PARAM_INT);
-            $result = $statement->execute();
-            $insertID = $pdo->lastInsertId('sys_activation_report_id_seq');
-            $errorInfo = $statement->errorInfo();
-            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                throw new \PDOException($errorInfo[0]);
-            //$pdo->commit();
-            return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);
+        try {             
         } catch (\PDOException $e /* Exception $e */) {
-            //$pdo->rollback();
-            return array("found" => false, "errorInfo" => $e->getMessage());
         }
     }
 
@@ -137,7 +100,7 @@ class BlActivationReport extends \DAL\DalSlim {
      * statements, table names are irrevelant and should be changed on specific
      * @author Okan CIRAN
      * sys_activation_report tablosuna parametre olarak gelen id deki kaydın bilgilerini günceller   !!
-     * @version v 1.0  04.02.2016
+     * @version v 1.0  08.03.2016
      * @param array | null $args  
      * @return array
      * @throws \PDOException
@@ -152,7 +115,7 @@ class BlActivationReport extends \DAL\DalSlim {
      * 
      * @author Okan CIRAN
      * @ public key e ait danışmanın gerçekleştirdiği operasyonları ve adetlerinin döndürür  !!
-     * @version v 1.0  04.02.2016
+     * @version v 1.0  08.03.2016
      * @param array | null $args
      * @return array
      * @throws \PDOException
@@ -163,7 +126,7 @@ class BlActivationReport extends \DAL\DalSlim {
             $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));            
             if (\Utill\Dal\Helper::haveRecord($opUserId)) {
                 $opUserIdValue = $opUserId['resultSet'][0]['user_id'];
-                
+              //// su anda kullanılmıyor.  
             $sql = "     
                SELECT count(a.id) AS adet , 
                     a.operation_type_id,
@@ -198,78 +161,39 @@ class BlActivationReport extends \DAL\DalSlim {
         }
     }
  
-     
-    /**
-     * 
-     * @author Okan CIRAN
-     * @ Aktif firma sayısını döndürür  !!
-     * @version v 1.0  05.02.2016
-     * @param array | null $args
-     * @return array
-     * @throws \PDOException
-     */
-    public function getAllFirmCount($params = array()) {
-        try {
-            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');  
-            $sql = "     
-                SELECT 
-                    COUNT(id) AS adet ,
-                    'Firma Sayısı' AS aciklama
-                FROM info_firm_profile 
-                WHERE deleted =0 AND active =0 AND language_parent_id =0               
-                    ";  
-            $statement = $pdo->prepare($sql);
-            $statement->execute();       
-            $result = $statement->fetchAll(\PDO::FETCH_CLASS);        
-            $errorInfo = $statement->errorInfo();
-            if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                throw new \PDOException($errorInfo[0]);
-            //return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-            return json_encode($result);         
-        } catch (\PDOException $e /* Exception $e */) {
-          //  $pdo->rollback();
-            return array("found" => false, "errorInfo" => $e->getMessage());
-        }
-    }
      /**
      * 
      * @author Okan CIRAN
-     * @ Aktif firma sayısını döndürür  !!
+     * @ Danışmanların firma sayılarını döndürür  !!
      * @version v 1.0  05.02.2016
      * @param array | null $args
      * @return array
      * @throws \PDOException
      */
-    public function getConsultantFirmCount($params = array()) {
+    public function getAllConsultantFirmCount($params = array()) {
         try {
-            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');             
-            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));            
-            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId['resultSet'][0]['user_id'];
-                
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');   
             $sql = "     
-                SELECT 
-                    COUNT(id) AS adet ,
+                 SELECT 
+                    COUNT(a.id) AS adet ,
+                    a.consultant_id,
+                    iu.username,
                     'Firma Sayısı' AS aciklama
-                FROM info_firm_profile 
-                WHERE deleted =0 AND active =0 AND language_parent_id =0 AND                
-                     consultant_id = ".intval($opUserIdValue)."
-                
+                FROM info_firm_profile a 
+                LEFT JOIN info_users iu on iu.id = a.consultant_id
+                WHERE a.deleted =0 AND a.active =0 AND a.language_parent_id =0  
+                GROUP BY a.consultant_id, iu.username 
+                ORDER BY adet 
                     ";  
             $statement = $pdo->prepare($sql);
-            //  echo debugPDO($sql, $params);
+           //   echo debugPDO($sql, $params);
             $statement->execute();       
             $result = $statement->fetchAll(\PDO::FETCH_CLASS);        
             $errorInfo = $statement->errorInfo();
             if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                 throw new \PDOException($errorInfo[0]);
             //return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
-            return json_encode($result);
-            } else {
-                $errorInfo = '23502';   // 23502  not_null_violation
-                $errorInfoColumn = 'pk';        
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
-            }
+            return json_encode($result);            
         } catch (\PDOException $e /* Exception $e */) {      
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
@@ -279,70 +203,56 @@ class BlActivationReport extends \DAL\DalSlim {
       /**
      * 
      * @author Okan CIRAN
-     * @ Aktif firma sayısını döndürür  !!
+     * @Admin dashboard üst bilgiler  !!
      * @version v 1.0  05.02.2016
      * @param array | null $args
      * @return array
      * @throws \PDOException
      */
-    public function getConsultantUpDashBoardCount($params = array()) {
+    public function getUpDashBoardCount($params = array()) {
         try {
-            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');             
-            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));            
-            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId['resultSet'][0]['user_id'];
-                
+            $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');    
             $sql = "  
                 
                     SELECT ids,aciklama,adet FROM  (
 				SELECT ids, aciklama, adet from (
 						SELECT      
 						    1 as ids, 
-						    cast('Toplam Firma Sayısı' as character varying(50))  AS aciklama,                      
+						    cast('Danışman Sayısı' as character varying(50))  AS aciklama,                      
 						     cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                          
-						FROM info_firm_profile a
-						WHERE deleted =0 AND active =0 AND language_parent_id =0 
+						FROM sys_osb_consultants a
+						WHERE a.deleted =0 AND a.active =0  AND a.language_parent_id =0
 				) as dasda
                     UNION 
 				SELECT   ids,  aciklama, adet from (
 						SELECT 
 						    2 as ids, 
-						    cast('Onaylanmış Firma Sayısı' as character varying(50))  AS aciklama,   
+						    cast('Firma Sayısı' as character varying(50))  AS aciklama,   
 						      cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                    
-						FROM info_firm_profile a
-						INNER JOIN sys_operation_types op ON op.parent_id = 2 AND a.operation_type_id = op.id AND op.active = 0 AND op.deleted =0
-						WHERE a.deleted =0 AND a.active =0 AND a.language_parent_id =0 AND
-						      a.operation_type_id = 5
+						FROM info_firm_profile a						
+						WHERE a.deleted =0 AND a.active =0 AND a.language_parent_id =0
 				) as dasdb
                     UNION 
 				SELECT  ids,   aciklama,    adet from (
 						SELECT  3 as ids,
-						 cast('Danışmanın Firma Sayısı' as character varying(50))  AS aciklama,                      
+						 cast('Makina Sayısı' as character varying(50))  AS aciklama,                      
 						        cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                     
-						FROM info_firm_profile a                                    
-						INNER JOIN info_users u ON u.id = a.consultant_id      
-						INNER JOIN sys_acl_roles acl ON acl.id = u.role_id  
-						WHERE a.active = 0 AND a.deleted = 0 AND a.language_parent_id =0 AND
-						    a.consultant_id = ".intval($opUserIdValue)." 
+						FROM sys_machine_tools a						
+						WHERE a.active = 0 AND a.deleted = 0 AND a.language_parent_id =0
 				) as dasc
                     UNION 
 				SELECT  ids, aciklama, adet from (
 						SELECT   4 as ids,  
-						cast('Danışman Onayı Bekleyen Firma' as character varying(50))  AS aciklama,                      
+						cast('Bekleyen Makina Önerileri' as character varying(50))  AS aciklama,                      
 						    cast(COALESCE(count(a.id),0) as character varying(5))   AS adet                         
-						FROM info_firm_profile a                                    
-						INNER JOIN info_users u ON u.id = a.consultant_id      
-						INNER JOIN sys_acl_roles acl ON acl.id = u.role_id  
-						INNER JOIN sys_operation_types op ON op.parent_id = 1 AND a.operation_type_id = op.id AND op.active = 0 AND op.deleted =0
-						WHERE a.language_parent_id =0 AND
-						    a.consultant_id =".intval($opUserIdValue)." 
+						FROM sys_machine_tools a						
+						WHERE a.active = 1 AND a.deleted = 1 AND a.language_parent_id =0
+						
 				 ) as dasdd
 				 
-		   ) AS ttemp
-                ORDER BY ids 
-                    ";  
-            
-            
+                    ) AS ttemp
+                    ORDER BY ids 
+                        ";  
             $statement = $pdo->prepare($sql);
             //  echo debugPDO($sql, $params);
             $statement->execute();       
@@ -352,10 +262,6 @@ class BlActivationReport extends \DAL\DalSlim {
                 throw new \PDOException($errorInfo[0]);
             //return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
             return json_encode($result);
-            } else {
-                $errorInfo = '23502';   // 23502  not_null_violation
-                $errorInfoColumn = 'pk';        
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);            }
         } catch (\PDOException $e /* Exception $e */) {  
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
@@ -371,33 +277,15 @@ class BlActivationReport extends \DAL\DalSlim {
      * @throws \PDOException
      */
     
-    public function getConsWaitingForConfirm($params = array()) {
+    public function getDashBoardHighCharts($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');             
-            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));            
-            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId['resultSet'][0]['user_id'];
-                
             $sql = "                   
-               SELECT 
-                    aciklama , 
-                    CASE
-                        WHEN sure_int > 50000 THEN CAST(SUBSTRING(sure FROM 1 FOR POSITION(' ' IN sure )-1 ) AS integer)
-                    ELSE 0 
-                    END AS sure
-                FROM (
-                    SELECT a.id,
-                        EXTRACT(EPOCH FROM age(a.s_date)) AS sure_int,  
-			a.firm_name AS aciklama, 
-                       CAST(CURRENT_TIMESTAMP - a.s_date AS VARCHAR(20)) AS sure
-                    FROM  info_firm_profile a                 
-                    INNER JOIN info_users u ON u.id = a.consultant_id   
-                    INNER JOIN sys_operation_types op ON op.parent_id = 1 AND a.operation_type_id = op.id AND op.active = 0 AND op.deleted =0
-                    WHERE a.language_parent_id =0 AND
-                        a.consultant_id = ".intval($opUserIdValue)."                     
-                    ) AS asdasd
-                ORDER BY sure DESC
-                LIMIT 6
+                SELECT COUNT(id), CAST(s_date AS date) AS tt
+                FROM hstry_login
+                GROUP BY tt
+                ORDER BY tt DESC  
+                LIMIT 31
   
                     ";  
             $statement = $pdo->prepare($sql);
@@ -409,11 +297,7 @@ class BlActivationReport extends \DAL\DalSlim {
                 throw new \PDOException($errorInfo[0]);
             //return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
             return json_encode($result);
-            } else {
-                $errorInfo = '23502';   // 23502  not_null_violation
-                $errorInfoColumn = 'pk';          
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
-            }
+             
         } catch (\PDOException $e /* Exception $e */) {            
             return array("found" => false, "errorInfo" => $e->getMessage());
         }
