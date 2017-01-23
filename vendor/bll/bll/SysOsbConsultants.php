@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -68,7 +68,6 @@ class SysOsbConsultants extends \BLL\BLLSlim {
      * @return array
      */
     public function fillGrid($params = array()) {
-
         $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
         $resultSet = $DAL->fillGrid($params);
         return $resultSet['resultSet'];
@@ -115,5 +114,57 @@ class SysOsbConsultants extends \BLL\BLLSlim {
         $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
         return $DAL->getConsConfirmationProcessDetails($params);
     }
-
+    
+    /**
+     * Data update function   
+     * @param array $params
+     * @return array
+     */
+    public function getAllFirmCons($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
+        return $DAL->getAllFirmCons($params);
+    } 
+    
+  /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillOsbConsultantListGrid ($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
+        $resultSet = $DAL->fillOsbConsultantListGrid($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillOsbConsultantListGridRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
+        $resultSet = $DAL->fillOsbConsultantListGridRtc($params);  
+        return $resultSet['resultSet'];
+    }   
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
+        return $DAL->makeActiveOrPassive($params);
+    } 
+    
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function getBeAssignedConsultant($params = array()) {
+    $DAL = $this->slimApp->getDALManager()->get('sysOsbConsultantsPDO');
+    $resultSet = $DAL->getBeAssignedConsultant($params);  
+    return $resultSet['resultSet'];
+    }
+     
 }

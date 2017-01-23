@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -57,7 +57,8 @@ class LogConnection extends \DAL\DalSlim {
                 a.path, 
                 a.ip, 
                 a.params,
-                a.method
+                a.method,
+                a.request_info
             FROM connection_log a 
             INNER JOIN sys_operation_types so ON so.id = a.type_id
             INNER JOIN info_users b ON CRYPT(b.sf_private_key_value,CONCAT('_J9..',REPLACE(a.pk,'*','/'))) = CONCAT('_J9..',REPLACE(a.pk,'*','/')) 
@@ -87,12 +88,19 @@ class LogConnection extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectLogFactory');
             $pdo->beginTransaction();
-            $userId = InfoUsers::getUserId(array('pk' => $params['pk']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-                $addSql = " op_user_id,";
-                $addSqlValue = " ".  intval($userIdValue).", ";
-            }
+            
+            $pk = NULL;
+            $userIdValue = NULL;
+            if ((isset($params['pk']) && $params['pk'] != "")) {
+                $pk = $params['pk'] ;
+                $opUserIdParams = array('pk' =>  $params['pk'],);
+                $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+                $opUserId = $opUserIdArray->getUserId($opUserIdParams); 
+                if (\Utill\Dal\Helper::haveRecord($userId)) {
+                    $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];                    
+                }
+            }              
+          
             $sql = "
                 INSERT INTO connection_log(
                        pk, 
@@ -101,10 +109,10 @@ class LogConnection extends \DAL\DalSlim {
                        url, 
                        path, 
                        ip, 
-                       params,
-                       ".$addSql." 
-                       method
-                       
+                       op_user_id,
+                       params,                       
+                       method,
+                       request_info
                        )
                 VALUES (
                         :pk,
@@ -113,21 +121,24 @@ class LogConnection extends \DAL\DalSlim {
                         :url, 
                         :path, 
                         :ip, 
-                        :params,
-                        ".$addSqlValue." 
-                        :method                       
+                        :op_user_id, 
+                        :params,                        
+                        :method,
+                        :request_info
                                              )   ";
             $statement = $pdo->prepare($sql);
-            $statement->bindValue(':pk', $params['pk'], \PDO::PARAM_STR);
+            $statement->bindValue(':pk', $pk, \PDO::PARAM_STR);
             $statement->bindValue(':type_id', $params['type_id'], \PDO::PARAM_INT);
             $statement->bindValue(':log_datetime', $params['log_datetime'], \PDO::PARAM_STR);
             $statement->bindValue(':url', $params['url'], \PDO::PARAM_STR);
             $statement->bindValue(':path', $params['path'], \PDO::PARAM_STR);
             $statement->bindValue(':ip', $params['ip'], \PDO::PARAM_STR);
             $statement->bindValue(':params', $params['params'], \PDO::PARAM_STR);
+            $statement->bindValue(':op_user_id', $opUserIdValue, \PDO::PARAM_INT);            
             $statement->bindValue(':method', $params['method'], \PDO::PARAM_STR);
+            $statement->bindValue(':request_info', $params['request_info'], \PDO::PARAM_STR);
 
-            echo debugPDO($sql, $params);
+          //  echo debugPDO($sql, $params);
             $result = $statement->execute();
             $insertID = $pdo->lastInsertId('connection_log_id_seq');
             $errorInfo = $statement->errorInfo();
@@ -156,8 +167,6 @@ class LogConnection extends \DAL\DalSlim {
     }
  
     /**
-     * Datagrid fill function used for testing
-     * user interface datagrid fill operation   
      * @author Okan CIRAN
      * @ Gridi doldurmak için connection_log tablosundan kayıtları döndürür !!
      * @version v 1.0  10.03.2016
@@ -211,7 +220,8 @@ class LogConnection extends \DAL\DalSlim {
                 a.path, 
                 a.ip, 
                 a.params,
-                a.method
+                a.method,
+                a.request_info
             FROM connection_log a 
             INNER JOIN sys_operation_types so ON so.id = a.type_id
             INNER JOIN info_users b ON CRYPT(b.sf_private_key_value,CONCAT('_J9..',REPLACE(a.pk,'*','/'))) = CONCAT('_J9..',REPLACE(a.pk,'*','/')) 

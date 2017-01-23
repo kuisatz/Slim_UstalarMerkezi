@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -18,7 +18,7 @@ namespace DAL\PDO;
  */
 class InfoError extends \DAL\DalSlim {
 
-    /**
+    /** 
      * @author Okan CIRAN
      * @ info_error tablosundan parametre olarak  gelen id kaydını siler. !!
      * @version v 1.0  11.02.2016
@@ -251,8 +251,7 @@ class InfoError extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * user interface datagrid fill operation get row count for widget
+    /**     
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_error tablosundan çekilen kayıtlarının kaç tane olduğunu döndürür   !!
      * @version v 1.0  11.02.2016

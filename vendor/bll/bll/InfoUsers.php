@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -163,7 +163,7 @@ class InfoUsers extends \BLL\BLLSlim{
         return $DAL->getUserIdTemp($params);
     }
     
-        /**
+    /**
      * New user RrpMap insert function 
      * @param array | null $params
      * @return array
@@ -172,6 +172,79 @@ class InfoUsers extends \BLL\BLLSlim{
         $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
         return $DAL->setNewUserRrpMap($params);
     }
+    
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillUsersListNpk ($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        $resultSet = $DAL->fillUsersListNpk($params);  
+        return $resultSet['resultSet'];
+    }  
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillUsersListNpkRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        $resultSet = $DAL->fillUsersListNpkRtc($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillUsersInformationNpk ($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        $resultSet = $DAL->fillUsersInformationNpk($params);  
+        return $resultSet['resultSet'];
+    }  
+      
+    /**
+     * DAta insert function
+     * @param array | null $params
+     * @return array
+     */
+    public function insertConsultant($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->insertConsultant($params);
+    }
+     /**
+     * DAta insert function
+     * @param array | null $params
+     * @return array
+     */
+    public function insertUrgePerson($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->insertUrgePerson($params);
+    }
+    
+    /**
+     * New user RrpMap insert function 
+     * @param array | null $params
+     * @return array
+     */
+    public function setPersonPassword($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->setPersonPassword($params);
+    }
+    
+        /**
+     * New user RrpMap insert function 
+     * @param array | null $params
+     * @return array
+     */
+    public function updatePktempForSesionId($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoUsersPDO');
+        return $DAL->updatePktempForSesionId($params);
+    }
+    
     
 }
 

@@ -1,10 +1,10 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
- * @license   OKAN CİRANĞ
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
+ * @license   
  */
 
 namespace BLL\BLL;
@@ -84,19 +84,28 @@ class SysLanguage extends \BLL\BLLSlim{
         return $resultSet['resultSet'];
     }
 
-     public function fillComboBox() {
+     public function fillComboBox($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
-        $resultSet = $DAL->fillComboBox();  
+        $resultSet = $DAL->fillComboBox($params);  
         return $resultSet['resultSet'];
     }
     
-    public function getLanguageId() {
+    public function getLanguageId($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
-        $resultSet = $DAL->getLanguageId();  
+        $resultSet = $DAL->getLanguageId($params);  
         return $resultSet['resultSet'];
     }
-    
-    
+     
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+    */
+    public function fillLanguageDdList($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysLanguagePDO');
+        $resultSet = $DAL->fillLanguageDdList($params);
+        return $resultSet['resultSet'];
+    }
     
 }
 

@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -102,6 +102,48 @@ class SysNavigationLeft extends \BLL\BLLSlim{
         $resultSet = $DAL->getLeftMenuFull();  
         return $resultSet['resultSet'];
     }
+    /*
+     * Data update function   
+     * @param array $params
+     * @return array
+     */
+    public function fillGridForAdmin($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysNavigationLeftPDO');     
+        return $DAL->fillGridForAdmin($params);
+    }
+    
+     /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillGridForAdminRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysNavigationLeftPDO');
+        $resultSet = $DAL->fillGridForAdminRtc($params);  
+        return $resultSet['resultSet'];
+    } 
+    
+   
+   /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillForAdminTree($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysNavigationLeftPDO');     
+        return $DAL->fillForAdminTree($params);
+    }
+    
+     /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysNavigationLeftPDO');
+        return $DAL->makeActiveOrPassive($params);
+    }
+    
     
     
     

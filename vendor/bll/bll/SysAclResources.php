@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -104,6 +104,83 @@ class SysAclResources extends \BLL\BLLSlim{
         
         $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');
         $resultSet = $DAL->fillComboBoxFullResources($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillResourcesTree ($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');
+        $resultSet = $DAL->fillResourcesTree($params);  
+        return $resultSet['resultSet'];
+    }
+    
+   /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillPropertieslist ($params = array()) {
+        
+        $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');
+        $resultSet = $DAL->fillPropertieslist($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillPropertieslistRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');
+        $resultSet = $DAL->fillPropertieslistRtc($params);  
+        return $resultSet['resultSet'];
+    }    
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');
+        return $DAL->makeActiveOrPassive($params);
+    }
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillResourcesDdList($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');
+        $resultSet = $DAL->fillResourcesDdList($params);
+        return $resultSet['resultSet'];
+    }
+    
+       
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillResourceGroups($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclResourcesPDO');  
+     // print_r($params);
+         if (isset($params['parent_id']) && ($params['parent_id'] == 0))  { 
+            $resultSet = $DAL->fillResourceGroups($params);
+        } else {        
+            //if (isset($params['state']) && ($params['state'] == "closed") && 
+            //    isset($params['last_node']) && ($params['last_node'] == "true") &&   
+           //     isset($params['roles']) && $params['roles'] == "false" )  
+           // {            
+                $resultSet = $DAL->fillResourceGroupsRoles($params);
+           // } else {                        
+           //     $resultSet = $DAL->fillResourceGroups($params);                
+           // }
+        }        
         return $resultSet['resultSet'];
     }
     

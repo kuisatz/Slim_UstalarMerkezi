@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -19,6 +19,8 @@ final class FilterFactoryNames {
     const FILTER_PARANOID_LEVEL3 = 'onlyParanoidLevel3';
     const FILTER_PARANOID_LEVEL4 = 'onlyParanoidLevel4';
     
+    const FILTER_PARANOID_JASON_LVL1 = 'onlyParanoidJasonLvl1'; 
+    
     const FILTER_ONLY_ALPHABETIC_ALLOWED = 'onlyAlphabetic';
     const FILTER_ONLY_NUMBER_ALLOWED = 'onlyNumber';
     const FILTER_ONLY_TRUE_ALLOWED = 'onlyTrue';
@@ -26,6 +28,10 @@ final class FilterFactoryNames {
     const FILTER_ONLY_BOOLEAN_ALLOWED = 'onlyBoolean';
     const FILTER_ONLY_STATE_ALLOWED = 'onlyState';
     const FILTER_ONLY_LANGUAGE_CODE = 'onlyLanguageCode';
+    const FILTER_ONLY_ORDER = 'onlyOrder';
+    
+    
+    
     
     const FILTER_DEFAULT = 'onlyDefault';
     const FILTER_TRIM = 'filterTrim';

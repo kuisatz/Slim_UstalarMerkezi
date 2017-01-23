@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -48,8 +48,8 @@ class SysOsb extends \BLL\BLLSlim{
      * @return array
      */
     public function delete($params = array()) {
-        $DAL = $this->slimApp->getDALManager()->get('sysOsbPDO');
-        return $DAL->delete($params = array());
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbPDO');       
+        return $DAL->delete($params);
     }
 
     /**
@@ -83,7 +83,49 @@ class SysOsb extends \BLL\BLLSlim{
         $resultSet = $DAL->fillGridRowTotalCount($params);  
         return $resultSet['resultSet'];
     }
-  
+     
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+    */
+    public function fillOsbDdlist($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbPDO');
+        $resultSet = $DAL->fillOsbDdlist($params);
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillOsbList ($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbPDO');
+        $resultSet = $DAL->fillOsbList($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillOsbListRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbPDO');
+        $resultSet = $DAL->fillOsbListRtc($params);  
+        return $resultSet['resultSet'];
+    }    
+    
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysOsbPDO');
+        return $DAL->makeActiveOrPassive($params);
+    }
   
 }
 

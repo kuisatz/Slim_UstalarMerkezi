@@ -4,7 +4,7 @@
 require 'vendor/autoload.php';
 
 
-
+use \Services\Filter\Helper\FilterFactoryNames as stripChainers;
 
 /* $app = new \Slim\Slim(array(
   'mode' => 'development',
@@ -30,9 +30,10 @@ $app = new \Slim\SlimExtended(array(
 $res = $app->response();
 $res->header('Access-Control-Allow-Origin', '*');
 $res->header("Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS");
-
+$app->add(new \Slim\Middleware\MiddlewareInsertUpdateDeleteLog());
 $app->add(new \Slim\Middleware\MiddlewareHMAC());
 $app->add(new \Slim\Middleware\MiddlewareSecurity());
+$app->add(new \Slim\Middleware\MiddlewareMQManager());
 $app->add(new \Slim\Middleware\MiddlewareBLLManager());
 $app->add(new \Slim\Middleware\MiddlewareDalManager());
 $app->add(new \Slim\Middleware\MiddlewareServiceManager());
@@ -46,30 +47,39 @@ $app->add(new \Slim\Middleware\MiddlewareMQManager());
  * @since 25-01-2016
  */
 $app->get("/pkFillGrid_infoUsers/", function () use ($app ) {
-
-
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('infoUsersBLL');
-
     $headerParams = $app->request()->headers();
-    $vPk = $headerParams['X-Public'];
-    $vPkTemp = $headerParams['X-Public-Temp'];
-
+    if (!isset($headerParams['X-Public']))
+        throw new Exception('rest api "pkFillGrid_infoUsers" end point, X-Public variable not found');
+    $pk = $headerParams['X-Public'];
+    
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+        $stripper->offsetSet('language_code', $stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE, 
+                $app, $_GET['language_code']));
+    }
+    $stripper->strip();
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }   
+    
     $resDataGrid = $BLL->fillGrid(array('page' => $_GET['page'],
         'rows' => $_GET['rows'],
         'sort' => $_GET['sort'],
         'order' => $_GET['order'],
-        'search_name' => $vSearchName,
+        'language_code' => $vLanguageCode,
         'pk' => $pk,
-        'pktemp' => $vPkTemp));
+      ));
 
-    $resTotalRowCount = $BLL->fillGridRowTotalCount(array('search_name' => $vSearchName));
-
+    $resTotalRowCount = $BLL->fillGridRowTotalCount(array('language_code' => $vLanguageCode));
     $flows = array();
     foreach ($resDataGrid as $flow) {
         $flows[] = array(
             "id" => $flow["id"],
             "profile_public" => $flow["profile_public"],
-            "f_check" => $flow["f_check"],
+            "state_profile_public" => $flow["state_profile_public"],
             "s_date" => $flow["s_date"],
             "c_date" => $flow["c_date"],
             "operation_type_id" => $flow["operation_type_id"],
@@ -78,32 +88,29 @@ $app->get("/pkFillGrid_infoUsers/", function () use ($app ) {
             "surname" => $flow["surname"],
             "username" => $flow["username"],
             "auth_email" => $flow["auth_email"],
-            "language_code" => $flow["language_code"],
+            "user_language" => $flow["user_language"],
             "language_name" => $flow["language_name"],
             "state_deleted" => $flow["state_deleted"],
             "active" => $flow["active"],
             "state_active" => $flow["state_active"],
             "deleted" => $flow["deleted"],
-            "user_id" => $flow["user_id"],
-            "username" => $flow["username"],
+            "op_user_id" => $flow["op_user_id"],
+            "op_user_name" => $flow["op_user_name"],            
             "act_parent_id" => $flow["act_parent_id"],
             "auth_allow_id" => $flow["auth_allow_id"],
             "auth_alow" => $flow["auth_alow"],
             "cons_allow_id" => $flow["cons_allow_id"],
+            "cons_allow" => $flow["cons_allow"],
+            "consultant_id" => $flow["consultant_id"],
+            "cons_name" => $flow["cons_name"],
+            "cons_surname" => $flow["cons_surname"],            
             "attributes" => array("notroot" => true, "active" => $flow["active"]),
         );
     }
-
     $app->response()->header("Content-Type", "application/json");
-
     $resultArray = array();
     $resultArray['total'] = $resTotalRowCount[0]['count'];
     $resultArray['rows'] = $flows;
-
-    /* $app->contentType('application/json');
-      $app->halt(302, '{"error":"Something went wrong"}');
-      $app->stop(); */
-
     $app->response()->body(json_encode($resultArray));
 });
 
@@ -112,43 +119,85 @@ $app->get("/pkFillGrid_infoUsers/", function () use ($app ) {
  * @since 25-01-2016
  */
 $app->get("/pkInsert_infoUsers/", function () use ($app ) {
-
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('infoUsersBLL');
 
-    $fProfilePublic = $_GET['profile_public'];
-    $fName = $_GET['name'];
-    $fSurname = $_GET['surname'];
-    $fUsername = $_GET['username'];
-    $fPassword = $_GET['password'];
-    $fAuthEmail = $_GET['auth_email'];
-    $fLanguageCode = $_GET['language_code'];
-    $fConsAllowId = $_GET['cons_allow_id'];
-    $fPreferredLanguage = $_GET['preferred_language'];
-    $fpersonIdNumber = $_GET['personIdNumber'];
-    $foperationtypeid = $_GET['operation_type_id'];
-
-
     $headerParams = $app->request()->headers();
-    $vPk = $headerParams['X-Public'];
+    if (!isset($headerParams['X-Public']))
+        throw new Exception('rest api "pkInsert_infoUsers" end point, X-Public variable not found');
+    $pk = $headerParams['X-Public'];
 
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+        $stripper->offsetSet('language_code', $stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE, $app, $_GET['language_code']));
+    }
+    $vPreferredLanguage = 647;
+    if (isset($_GET['preferred_language'])) {
+        $stripper->offsetSet('preferred_language', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, $app, $_GET['preferred_language']));
+    }
+    $vProfilePublic = 0;
+    if (isset($_GET['profile_public'])) {
+        $stripper->offsetSet('profile_public', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, $app, $_GET['profile_public']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app, $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app, $_GET['surname']));
+    }
+    $vUsername = NULL;
+    if (isset($_GET['username'])) {
+        $stripper->offsetSet('username', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app, $_GET['username']));
+    }
+    $vPassword = NULL;
+    if (isset($_GET['password'])) {
+        $stripper->offsetSet('password', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, $app, $_GET['password']));
+    }
+    $vAuthEmail = NULL;
+    if (isset($_GET['auth_email'])) {
+        $stripper->offsetSet('auth_email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, $app, $_GET['auth_email']));
+    }
+
+    $stripper->strip();
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }
+    if ($stripper->offsetExists('profile_public')) {
+        $vProfilePublic = $stripper->offsetGet('profile_public')->getFilterValue();
+    }
+    if ($stripper->offsetExists('preferred_language')) {
+        $vPreferredLanguage = $stripper->offsetGet('preferred_language')->getFilterValue();
+    }
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    }
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    }
+    if ($stripper->offsetExists('username')) {
+        $vUsername = $stripper->offsetGet('username')->getFilterValue();
+    }
+    if ($stripper->offsetExists('password')) {
+        $vPassword = $stripper->offsetGet('password')->getFilterValue();
+    }
+    if ($stripper->offsetExists('auth_email')) {
+        $vAuthEmail = $stripper->offsetGet('auth_email')->getFilterValue();
+    } 
     $resDataInsert = $BLL->insert(array(
-        'profile_public' => $fProfilePublic,
-        'name' => $fName,
-        'surname' => $fSurname,
-        'username' => $fUsername,
-        'password' => $fPassword,
-        'auth_email' => $fAuthEmail,
-        'language_code' => $fLanguageCode,
-        'cons_allow_id' => $fConsAllowId,
-        'preferred_language' => $fPreferredLanguage,
-        'personIdNumber' => $fpersonIdNumber,
-        'operation_type_id' => $foperationtypeid,
-        'pk' => $vPk));
-
+        'url' => $_GET['url'],  
+        'profile_public' => $vProfilePublic,
+        'name' => $vName,
+        'surname' => $vSurname,
+        'username' => $vUsername,
+        'password' => $vPassword,
+        'auth_email' => $vAuthEmail,
+        'language_code' => $vLanguageCode,
+        'preferred_language' => $vPreferredLanguage,
+        'pk' => $pk));
     $app->response()->header("Content-Type", "application/json");
-
-
-
     $app->response()->body(json_encode($resDataInsert));
 }
 );
@@ -158,115 +207,224 @@ $app->get("/pkInsert_infoUsers/", function () use ($app ) {
  * @since 27-01-2016
  */
 $app->get("/tempInsert_infoUsers/", function () use ($app ) {
-
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('infoUsersBLL');
-
-    $vProfilePublic = $_GET['profile_public'];
-    $vName = $_GET['name'];
-    $vSurname = $_GET['surname'];
-    $vUsername = $_GET['username'];
-    $vPassword = $_GET['password'];
-    $vAuthEmail = $_GET['auth_email'];
-
-  
-    
-    $headerParams = $app->request()->headers();
-
+   // $headerParams = $app->request()->headers();
+    $vsesionId = NULL;
+    if (isset($_GET['sessionId'])) {
+        $stripper->offsetSet('sessionId', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['sessionId']));
+    } 
+    $vM = NULL;
+    if (isset($_GET['m'])) {
+        $stripper->offsetSet('m', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['m']));
+    }
+    $vA = NULL;
+    if (isset($_GET['a'])) {
+        $stripper->offsetSet('a', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['a']));
+    }
     $vLanguageCode = 'tr';
     if (isset($_GET['language_code'])) {
-        $vLanguageCode = strtolower(trim($_GET['language_code']));
+        $stripper->offsetSet('language_code', $stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE, 
+                $app, $_GET['language_code']));
     }
     $vPreferredLanguage = 647;
     if (isset($_GET['preferred_language'])) {
-        $vPreferredLanguage =  trim($_GET['preferred_language'] );
+        $stripper->offsetSet('preferred_language', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['preferred_language']));
+    }
+    $vProfilePublic = 0;
+    if (isset($_GET['profile_public'])) {
+        $stripper->offsetSet('profile_public', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['profile_public']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['surname']));
+    }
+    $vUsername = NULL;
+    if (isset($_GET['username'])) {
+        $stripper->offsetSet('username', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['username']));
+    }
+    $vPassword = NULL;
+    if (isset($_GET['password'])) {
+        $stripper->offsetSet('password', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['password']));
+    }
+    $vAuthEmail = NULL;
+    if (isset($_GET['auth_email'])) {
+        $stripper->offsetSet('auth_email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['auth_email']));
     }
 
-    $fProfilePublic = $vProfilePublic;
-    $fName = $vName;
-    $fSurname = $vSurname;
-    $fUsername = $vUsername;
-    $fPassword = $vPassword;
-    $fAuthEmail = $vAuthEmail;
-    $fLanguageCode = $vLanguageCode;
-    $fPreferredLanguage = $vPreferredLanguage;
- 
-    $resDataInsert = $BLL->insertTemp(array(
-        'profile_public' => $fProfilePublic,
-        'name' => $fName,
-        'surname' => $fSurname,
-        'username' => $fUsername,
-        'password' => $fPassword,
-        'auth_email' => $fAuthEmail,
-        'language_code' => $fLanguageCode,
-        'preferred_language' => $fPreferredLanguage,
-    ));
+    $stripper->strip();
+    if ($stripper->offsetExists('sessionId')) {
+        $vsesionId = $stripper->offsetGet('sessionId')->getFilterValue();
+    }
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }
+    if ($stripper->offsetExists('m')) {
+        $vM = $stripper->offsetGet('m')->getFilterValue();
+    }
+    if ($stripper->offsetExists('a')) {
+        $vA = $stripper->offsetGet('a')->getFilterValue();
+    }
+    if ($stripper->offsetExists('profile_public')) {
+        $vProfilePublic = $stripper->offsetGet('profile_public')->getFilterValue();
+    }
+    if ($stripper->offsetExists('preferred_language')) {
+        $vPreferredLanguage = $stripper->offsetGet('preferred_language')->getFilterValue();
+    }
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    }
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    }
+    if ($stripper->offsetExists('username')) {
+        $vUsername = $stripper->offsetGet('username')->getFilterValue();
+    }
+    if ($stripper->offsetExists('password')) {
+        $vPassword = $stripper->offsetGet('password')->getFilterValue();
+    }
+    if ($stripper->offsetExists('auth_email')) {
+        $vAuthEmail = $stripper->offsetGet('auth_email')->getFilterValue();
+    }
+    if ($vPreferredLanguage<0 ) {$vPreferredLanguage = 647 ;}
     
+    $resDataInsert = $BLL->insertTemp(array(
+        'url' => $_GET['url'], 
+        'sessionId' =>$vsesionId,  
+        'm' => $vM,
+        'a' => $vA,
+        'profile_public' => $vProfilePublic,
+        'name' => $vName,
+        'surname' => $vSurname,
+        'username' => $vUsername,
+        'password' => $vPassword,
+        'auth_email' => $vAuthEmail,
+        'language_code' => $vLanguageCode,
+        'preferred_language' => $vPreferredLanguage,
+    ));
     $app->response()->header("Content-Type", "application/json");
-
-    /* $app->contentType('application/json');
-      $app->halt(302, '{"error":"Something went wrong"}');
-      $app->stop(); */
-
     $app->response()->body(json_encode($resDataInsert));
 }
 );
-
 
 /**
  *  * Okan CIRAN
  * @since 27-01-2016
  */
 $app->get("/pktempUpdate_infoUsers/", function () use ($app ) {
-
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('infoUsersBLL');
+    $headerParams = $app->request()->headers();    
+    if (!isset($headerParams['X-Public-Temp']))
+        throw new Exception('rest api "pktempUpdate_infoUsers" end point, X-Public variable not found');
+    $PkTemp = $headerParams['X-Public-Temp'];    
 
-    $vProfilePublic = $_GET['profile_public'];
-    $vName = $_GET['name'];
-    $vSurname = $_GET['surname'];
-    $vUsername = $_GET['username'];
-    $vPassword = $_GET['password'];
-    $vAuthEmail = $_GET['auth_email'];
-
-    $headerParams = $app->request()->headers();
-    $vPkTemp = $headerParams['X-Public-Temp'];    
-    
-
+    $vM = NULL;
+    if (isset($_GET['m'])) {
+        $stripper->offsetSet('m', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['m']));
+    }
+    $vA = NULL;
+    if (isset($_GET['a'])) {
+        $stripper->offsetSet('a', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['a']));
+    }
     $vLanguageCode = 'tr';
     if (isset($_GET['language_code'])) {
-        $vLanguageCode = strtolower(trim($_GET['language_code']));
+        $stripper->offsetSet('language_code', $stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE, $app, $_GET['language_code']));
     }
     $vPreferredLanguage = 647;
     if (isset($_GET['preferred_language'])) {
-        $vPreferredLanguage =  trim($_GET['preferred_language'] );
+        $stripper->offsetSet('preferred_language', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, $app, $_GET['preferred_language']));
+    }
+    $vProfilePublic = 0;
+    if (isset($_GET['profile_public'])) {
+        $stripper->offsetSet('profile_public', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, $app, $_GET['profile_public']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app, $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app, $_GET['surname']));
+    }
+    $vUsername = NULL;
+    if (isset($_GET['username'])) {
+        $stripper->offsetSet('username', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, $app, $_GET['username']));
+    }
+    $vPassword = NULL;
+    if (isset($_GET['password'])) {
+        $stripper->offsetSet('password', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, $app, $_GET['password']));
+    }
+    $vAuthEmail = NULL;
+    if (isset($_GET['auth_email'])) {
+        $stripper->offsetSet('auth_email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, $app, $_GET['auth_email']));
     }
 
-    $fProfilePublic = $vProfilePublic;
-    $fName = $vName;
-    $fSurname = $vSurname;
-    $fUsername = $vUsername;
-    $fPassword = $vPassword;
-    $fAuthEmail = $vAuthEmail;
-    $fLanguageCode = $vLanguageCode;
-    $fPreferredLanguage = $vPreferredLanguage;
+    $stripper->strip();
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }
+    if ($stripper->offsetExists('m')) {
+        $vM = $stripper->offsetGet('m')->getFilterValue();
+    }
+    if ($stripper->offsetExists('a')) {
+        $vA = $stripper->offsetGet('a')->getFilterValue();
+    }
+    if ($stripper->offsetExists('profile_public')) {
+        $vProfilePublic = $stripper->offsetGet('profile_public')->getFilterValue();
+    }
+    if ($stripper->offsetExists('preferred_language')) {
+        $vPreferredLanguage = $stripper->offsetGet('preferred_language')->getFilterValue();
+    }
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    }
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    }
+    if ($stripper->offsetExists('username')) {
+        $vUsername = $stripper->offsetGet('username')->getFilterValue();
+    }
+    if ($stripper->offsetExists('password')) {
+        $vPassword = $stripper->offsetGet('password')->getFilterValue();
+    }
+    if ($stripper->offsetExists('auth_email')) {
+        $vAuthEmail = $stripper->offsetGet('auth_email')->getFilterValue();
+    }
  
     $resDataInsert = $BLL->UpdateTemp(array(
-        'profile_public' => $fProfilePublic,
-        'name' => $fName,
-        'surname' => $fSurname,
-        'username' => $fUsername,
-        'password' => $fPassword,
-        'auth_email' => $fAuthEmail,
-        'language_code' => $fLanguageCode,
-        'preferred_language' => $fPreferredLanguage,
-        'pktemp' => $vPkTemp
-    ));
-    
+        'url' => $_GET['url'],  
+        'm' => $vM,
+        'a' => $vA,
+        'profile_public' => $vProfilePublic,
+        'name' => $vName,
+        'surname' => $vSurname,
+        'username' => $vUsername,
+        'password' => $vPassword,
+        'auth_email' => $vAuthEmail,
+        'language_code' => $vLanguageCode,
+        'preferred_language' => $vPreferredLanguage,
+        'pktemp' => $PkTemp
+    ));    
     $app->response()->header("Content-Type", "application/json");
-
-    /* $app->contentType('application/json');
-      $app->halt(302, '{"error":"Something went wrong"}');
-      $app->stop(); */
-
     $app->response()->body(json_encode($resDataInsert));
 }
 );
@@ -276,235 +434,103 @@ $app->get("/pktempUpdate_infoUsers/", function () use ($app ) {
  * @since 25-01-2016
  */
 $app->get("/pkUpdate_infoUsers/", function () use ($app ) {
-
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('infoUsersBLL');
 
     $headerParams = $app->request()->headers();
-    $vpk = $headerParams['X-Public'];
-    $vPkTemp = $headerParams['X-Public-Temp'];
-
-    $vFCheck = 0;
-    if (isset($_GET['f_check'])) {
-        $vFCheck = $_GET ["f_check"];
-    }
-    $vAuthAllowId = 0;
-    if (isset($_GET['auth_allow_id'])) {
-        $vFCheck = $_GET ["auth_allow_id"];
-    }
-    $vConsAllowId = 0;
-    if (isset($_GET['cons_allow_id'])) {
-        $vConsAllowId = $_GET ["cons_allow_id"];
-    }
-    $vActParentId = 0;
-    if (isset($_GET['act_parent_id'])) {
-        $vActParentId = $_GET ["act_parent_id"];
-    }
+    if (!isset($headerParams['X-Public']))
+        throw new Exception('rest api "pkUpdate_infoUsers" end point, X-Public variable not found');
+    $pk = $headerParams['X-Public'];
 
     $vLanguageCode = 'tr';
     if (isset($_GET['language_code'])) {
-        $vLanguageCode = strtolower(trim($_GET['language_code']));
+        $stripper->offsetSet('language_code', $stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE, 
+                    $app, $_GET['language_code']));
+    }
+    $vId =-1;
+    if (isset($_GET['id'])) {
+        $stripper->offsetSet('id', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                    $app, $_GET['id']));
     }
     $vPreferredLanguage = 647;
     if (isset($_GET['preferred_language'])) {
-        $vPreferredLanguage = strtolower(trim($_GET['preferred_language']));
+        $stripper->offsetSet('preferred_language', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                    $app, $_GET['preferred_language']));
+    }
+    $vProfilePublic = 0;
+    if (isset($_GET['profile_public'])) {
+        $stripper->offsetSet('profile_public', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                    $app, $_GET['profile_public']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                    $app, $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                    $app, $_GET['surname']));
+    }
+    $vUsername = NULL;
+    if (isset($_GET['username'])) {
+        $stripper->offsetSet('username', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                    $app, $_GET['username']));
+    }
+    $vPassword = NULL;
+    if (isset($_GET['password'])) {
+        $stripper->offsetSet('password', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                    $app, $_GET['password']));
+    }
+    $vAuthEmail = NULL;
+    if (isset($_GET['auth_email'])) {
+        $stripper->offsetSet('auth_email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['auth_email']));
     }
 
-
-
-    $vID = $_GET['id'];
-    $vOperationTypeId = $_GET['operation_type_id'];
-    $vActive = $_GET['active'];
-    $vProfilePublic = $_GET['profile_public'];
-    $vName = $_GET['name'];
-    $vSurname = $_GET['surname'];
-    $vUsername = $_GET['username'];
-    $vPassword = $_GET['password'];
-    $vAuthEmail = $_GET['auth_email'];
-
-
-
-    $validater = $app->getServiceManager()->get('validationChainerServiceForZendChainer');
-    $validatorChainUrl = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet(array_search($_GET['url'], $_GET), new \Utill\Validation\Chain\ZendValidationChainer($app, $_GET['url'], $validatorChainUrl->attach(
-                    new Zend\Validator\StringLength(array('min' => 6,
-                'max' => 50)))
-            // ->attach(new Zend\I18n\Validator\Alnum())    
-    ));
-
-
-    $validatorChainName = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('name', new \Utill\Validation\Chain\ZendValidationChainer($app, $vName, $validatorChainName->attach(
-                            new Zend\Validator\StringLength(array('min' => 2,
-                        'max' => 80)))
-                    ->attach(new Zend\I18n\Validator\Alpha())
-    ));
-    $validatorChainSurname = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('surname', new \Utill\Validation\Chain\ZendValidationChainer($app, $vSurname, $validatorChainSurname->attach(
-                            new Zend\Validator\StringLength(array('min' => 2,
-                        'max' => 80)))
-                    ->attach(new Zend\I18n\Validator\Alpha())
-    ));
-
-    $validatorChainUsername = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('username', new \Utill\Validation\Chain\ZendValidationChainer($app, $vUsername, $validatorChainUsername->attach(
-                    new Zend\Validator\StringLength(array('min' => 6,
-                'max' => 35)))
-            //   ->attach(new Zend\I18n\Validator\Alnum())    
-    ));
-
-    $validatorChainPassword = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('password', new \Utill\Validation\Chain\ZendValidationChainer($app, $vPassword, $validatorChainPassword->attach(
-                            new Zend\Validator\StringLength(array('min' => 8,
-                        'max' => 20)))
-                    ->attach(new Zend\I18n\Validator\Alnum())
-    ));
-    $validatorChainAuthEmail = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('auth_email', new \Utill\Validation\Chain\ZendValidationChainer($app, $vAuthEmail, $validatorChainAuthEmail->attach(
-                            new Zend\Validator\StringLength(array('min' => 8,
-                        'max' => 20)))
-                    //->attach(new Zend\I18n\Validator\Alnum()) 
-                    ->attach(new Zend\Validator\EmailAddress())
-    ));
-
-    $validatorChainPreferredLanguage = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('preferred_language', new \Utill\Validation\Chain\ZendValidationChainer($app, $vPreferredLanguage, $validatorChainPreferredLanguage->attach(
-                            new Zend\Validator\StringLength(array(//'min' => 8,
-                        'max' => 2)))
-                    ->attach(new Zend\I18n\Validator\Alpha())
-    ));
-
-    $validatorChainLanguageCode = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('language_code', new \Utill\Validation\Chain\ZendValidationChainer($app, $vLanguageCode, $validatorChainLanguageCode->attach(
-                            new Zend\Validator\StringLength(array('min' => 2,
-                        'max' => 2)))
-                    ->attach(new Zend\I18n\Validator\Alpha())
-    ));
-
-    $validatorChainId = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('id', new \Utill\Validation\Chain\ZendValidationChainer($app, $vID, $validatorChainId->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                            // ,'max' => 2
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-    $validatorChainOperationTypeId = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('operation_type_id', new \Utill\Validation\Chain\ZendValidationChainer($app, $vOperationTypeId, $validatorChainOperationTypeId->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                            // ,'max' => 2
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-    $validatorChainActive = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('active', new \Utill\Validation\Chain\ZendValidationChainer($app, $vActive, $validatorChainActive->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                        , 'max' => 1
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-    $validatorChainProfilePublic = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('profile_public', new \Utill\Validation\Chain\ZendValidationChainer($app, $vProfilePublic, $validatorChainProfilePublic->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                        , 'max' => 1
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-    $validatorChainFCheck = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('f_check', new \Utill\Validation\Chain\ZendValidationChainer($app, $vFCheck, $validatorChainFCheck->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                        , 'max' => 1
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-
-    $validatorChainAuthAllowId = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('auth_allow_id', new \Utill\Validation\Chain\ZendValidationChainer($app, $vAuthAllowId, $validatorChainAuthAllowId->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                        , 'max' => 1
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-    $validatorChainConsAllowId = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('cons_allow_id', new \Utill\Validation\Chain\ZendValidationChainer($app, $vConsAllowId, $validatorChainConsAllowId->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                        , 'max' => 1
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-
-    $validatorChainActParentId = new Zend\Validator\ValidatorChain();
-    $validater->offsetSet('act_parent_id', new \Utill\Validation\Chain\ZendValidationChainer($app, $vActParentId, $validatorChainActParentId->attach(
-                            new Zend\Validator\StringLength(array('min' => 1
-                        , 'max' => 1
-                    )))
-                    ->attach(new Zend\Validator\Digits())
-    ));
-
-
-
-    $validater->validate();
-    $messager = $app->getServiceManager()->get('validatorMessager');
-    print_r($messager->getValidationMessage());
-
-
-
-
-
-
-    $fID = $vID;
-    $fOperationTypeId = $vOperationTypeId;
-    $fActive = $vActive;
-    $fActParentId = $vActParentId;
-    $fLanguageCode = $vLanguageCode;
-    $fProfilePublic = $vProfilePublic;
-    $fName = $vName;
-    $fSurname = $vSurname;
-    $fUsername = $vUsername;
-    $fPassword = $vPassword;
-    $fAuthEmail = $vAuthEmail;
-    $fPreferredLanguage = $vPreferredLanguage;
-    $fFCheck = $vFCheck;
-    $fAuthAllowId = $vAuthAllowId;
-    $fConsAllowId = $vConsAllowId;
-    $fpk = $vpk;
-    $fPkTemp = $vPkTemp;
-
-    /*
-     * filtre işlemleri
-     */
+    $stripper->strip();
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }
+    if ($stripper->offsetExists('id')) {
+        $vId = $stripper->offsetGet('id')->getFilterValue();
+    }
+    if ($stripper->offsetExists('profile_public')) {
+        $vProfilePublic = $stripper->offsetGet('profile_public')->getFilterValue();
+    }
+    if ($stripper->offsetExists('preferred_language')) {
+        $vPreferredLanguage = $stripper->offsetGet('preferred_language')->getFilterValue();
+    }
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    }
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    }
+    if ($stripper->offsetExists('username')) {
+        $vUsername = $stripper->offsetGet('username')->getFilterValue();
+    }
+    if ($stripper->offsetExists('password')) {
+        $vPassword = $stripper->offsetGet('password')->getFilterValue();
+    }
+    if ($stripper->offsetExists('auth_email')) {
+        $vAuthEmail = $stripper->offsetGet('auth_email')->getFilterValue();
+    } 
 
     $resDataUpdate = $BLL->update(array(
-        'id' => $fID,
-        'f_check' => $fFCheck,
-        'operation_type_id' => $fOperationTypeId,
-        'active' => $fActive,
-        'act_parent_id' => $fActParentId,
-        'language_code' => $fLanguageCode,
-        'profile_public' => $fProfilePublic,
-        'name' => $fName,
-        'surname' => $fSurname,
-        'username' => $fUsername,
-        'password' => $fPassword,
-        'auth_email' => $fAuthEmail,
-        'auth_allow_id' => $fAuthAllowId,
-        'cons_allow_id' => $fConsAllowId,
-        'preferred_language' => $fPreferredLanguage,
-        'pk' => $fpk,
-        'pktemp' => $vPkTemp));
-
+        'url' => $_GET['url'],  
+        'id' => $vId,
+        'profile_public' => $vProfilePublic,
+        'name' => $vName,
+        'surname' => $vSurname,
+        'username' => $vUsername,
+        'password' => $vPassword,
+        'auth_email' => $vAuthEmail,
+        'language_code' => $vLanguageCode,
+        'preferred_language' => $vPreferredLanguage,
+        'pk' => $pk));
     $app->response()->header("Content-Type", "application/json");
-
-
-    /* $app->contentType('application/json');
-      $app->halt(302, '{"error":"Something went wrong"}');
-      $app->stop(); */
-
     $app->response()->body(json_encode($resDataUpdate));
 });
 
@@ -513,103 +539,464 @@ $app->get("/pkUpdate_infoUsers/", function () use ($app ) {
  * @since 25-01-2016
  */
 $app->get("/pkDeletedAct_infoUsers/", function () use ($app ) {
-
+$stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
     $BLL = $app->getBLLManager()->get('infoUsersBLL');
 
     $headerParams = $app->request()->headers();
-    $pk = $headerParams['X-Public'];
-
-    $resDataUpdate = $BLL->deletedAct(array(
-        'id' => $_GET['id'],
-        'operation_type_id' => $_GET['operation_type_id'],
-        'pk' => $pk));
-
-    $app->response()->header("Content-Type", "application/json");
-
-    $app->response()->body(json_encode($resDataUpdate));
-});
-
-
-/**
- *  * Okan CIRAN
- * @since 25-01-2016
- */
-$app->get("/pkDelete_infoUsers/", function () use ($app ) {
-
-    $BLL = $app->getBLLManager()->get('infoUsersBLL');
-
-    $headerParams = $app->request()->headers();
-    $pk = $headerParams['X-Public'];
-
-    $resDataUpdate = $BLL->delete(array(
-        'id' => $_GET['id'],
-        'pk' => $pk));
-
-    $app->response()->header("Content-Type", "application/json");
-
-    /* $app->contentType('application/json');
-      $app->halt(302, '{"error":"Something went wrong"}');
-      $app->stop(); */
-
-    $app->response()->body(json_encode($resDataUpdate));
-});
-
-
-/**
- *  * Okan CIRAN
- * @since 25-01-2016
- */
-$app->get("/pkGetAll_infoUsers/", function () use ($app ) {
-
-    $BLL = $app->getBLLManager()->get('infoUsersBLL');
-
-    $resDataGrid = $BLL->getAll(array(
-        'pk' => $pk));
-
-    $resTotalRowCount = $BLL->fillGridRowTotalCount(array('search_name' => $vSearchName));
-
-    $flows = array();
-    foreach ($resDataGrid as $flow) {
-        $flows[] = array(
-            "id" => $flow["id"],
-            "profile_public" => $flow["profile_public"],
-            "f_check" => $flow["f_check"],
-            "s_date" => $flow["s_date"],
-            "c_date" => $flow["c_date"],
-            "operation_type_id" => $flow["operation_type_id"],
-            "operation_name" => $flow["operation_name"],
-            "name" => $flow["name"],
-            "surname" => $flow["surname"],
-            "username" => $flow["username"],
-            "auth_email" => $flow["auth_email"],
-            "language_code" => $flow["language_code"],
-            "language_name" => $flow["language_name"],
-            "state_deleted" => $flow["state_deleted"],
-            "active" => $flow["active"],
-            "state_active" => $flow["state_active"],
-            "deleted" => $flow["deleted"],
-            "user_id" => $flow["user_id"],
-            "username" => $flow["username"],
-            "act_parent_id" => $flow["act_parent_id"],
-            "auth_allow_id" => $flow["auth_allow_id"],
-            "auth_alow" => $flow["auth_alow"],
-            "cons_allow_id" => $flow["cons_allow_id"],
-            "personIdNumber" => $_GET['personIdNumber'],
-            "attributes" => array("notroot" => true, "active" => $flow["active"]),
-        );
+    if (!isset($headerParams['X-Public']))
+        throw new Exception('rest api "pkDeletedAct_infoUsers" end point, X-Public variable not found');
+    $pk = $headerParams['X-Public'];   
+    $vId = -1;
+    if (isset($_GET['id'])) {
+        $stripper->offsetSet('id', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                    $app, $_GET['id']));
     }
+    $stripper->strip(); 
+    if ($stripper->offsetExists('id')) {
+        $vId = $stripper->offsetGet('id')->getFilterValue();
+    }
+    $resDataUpdate = $BLL->deletedAct(array(
+        'url' => $_GET['url'],  
+        'id' => $vId,       
+        'pk' => $pk));
+    $app->response()->header("Content-Type", "application/json");
+    $app->response()->body(json_encode($resDataUpdate));
+});
+ 
+/**
+ *  * Okan CIRAN
+ * @since 26-04-2016
+ */
+$app->get("/pkFillUsersListNpk_infoUsers/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();    
+    $BLL = $app->getBLLManager()->get('infoUsersBLL');
+    $headerParams = $app->request()->headers(); 
+     if (!isset($headerParams['X-Public'])) {
+        throw new Exception('rest api "pkFillUsersListNpk_infoUsers" end point, X-Public variable not found');
+    }
+    $pk = $headerParams['X-Public'];
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+         $stripper->offsetSet('language_code',$stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE,
+                                                $app,
+                                                $_GET['language_code']));
+    }  
+    $vNetworkKey = NULL;
+    if (isset($_GET['npk'])) {
+        $stripper->offsetSet('npk', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                                                $app,
+                                                $_GET['npk']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                                                $app,
+                                                $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                                                $app,
+                                                $_GET['surname']));
+    }
+    $vEmail = NULL;
+    if (isset($_GET['email'])) {
+        $stripper->offsetSet('email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                                                $app,
+                                                $_GET['email']));
+    }
+    $vCommunicationNumber = NULL;
+    if (isset($_GET['communication_number'])) {
+        $stripper->offsetSet('communication_number', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED,
+                                                $app,
+                                                $_GET['communication_number']));
+    }
+    $filterRules = NULL;
+    if (isset($_GET['filterRules'])) {
+        $stripper->offsetSet('filterRules', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_JASON_LVL1, $app, $_GET['filterRules']));
+    }
+    $stripper->strip();
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }     
+    if ($stripper->offsetExists('npk')) {
+        $vNetworkKey = $stripper->offsetGet('npk')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('email')) {
+        $vEmail = $stripper->offsetGet('email')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('communication_number')) {
+        $vCommunicationNumber = $stripper->offsetGet('communication_number')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('filterRules')) {
+        $filterRules = $stripper->offsetGet('filterRules')->getFilterValue();
+    } 
+    $resDataGrid = $BLL->FillUsersListNpk(array(
+        'url' => $_GET['url'],  
+        'language_code' => $vLanguageCode,
+        'network_key' => $vNetworkKey,  
+        'name' => $vName,  
+        'surname' => $vSurname,  
+        'email' => $vEmail,  
+        'communication_number' => $vCommunicationNumber,
+        'filterRules' => $filterRules,
+        'pk'=> $pk,
+    ));
+    $resTotalRowCount = $BLL->FillUsersListNpkRtc(array(
+        'language_code' => $vLanguageCode,
+        'network_key' => $vNetworkKey,  
+        'name' => $vName,  
+        'surname' => $vSurname,  
+        'email' => $vEmail,  
+        'communication_number' => $vCommunicationNumber,
+        'filterRules' => $filterRules,
+        'pk'=> $pk,
+    ));
+    $counts=0;
+     
+    $flows = array();
+    if (isset($resDataGrid[0]['name'])) { 
+    foreach ($resDataGrid as $flow) {
+        $flows[] = array(            
+            "name" => html_entity_decode($flow["name"]),
+            "surname" => html_entity_decode($flow["surname"]),
+            "email" => $flow["email"],
+            "iletisimadresi" => html_entity_decode($flow["iletisimadresi"]),
+            "faturaadresi" => html_entity_decode($flow["faturaadresi"]),
+            "communication_number1" => $flow["communication_number1"],
+            "communication_number2" => $flow["communication_number2"],  
+            "language_id" => $flow["language_id"],
+            "language_name" => html_entity_decode($flow["language_name"]),    
+            "network_key" => $flow["network_key"],  
+            "attributes" => array("notroot" => true, ),
+        );
+        }
+       $counts = $resTotalRowCount[0]['count'];
+     }    
 
     $app->response()->header("Content-Type", "application/json");
-
-    $resultArray = array();
-    $resultArray['total'] = $resTotalRowCount[0]['count'];
+    $resultArray = array(); 
+    $resultArray['total'] = $counts;
     $resultArray['rows'] = $flows;
-
-    /* $app->contentType('application/json');
-      $app->halt(302, '{"error":"Something went wrong"}');
-      $app->stop(); */
-
     $app->response()->body(json_encode($resultArray));
 });
+ 
+/**
+ *  * Okan CIRAN
+ * @since 26-04-2016
+ */
+$app->get("/pkFillUsersInformationNpk_infoUsers/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();    
+    $BLL = $app->getBLLManager()->get('infoUsersBLL');
+    $headerParams = $app->request()->headers(); 
+     if (!isset($headerParams['X-Public'])) {
+        throw new Exception('rest api "pkFillUsersInformationNpk_infoUsers" end point, X-Public variable not found');
+    }
+    $pk = $headerParams['X-Public'];
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+         $stripper->offsetSet('language_code',$stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE,
+                                                $app,
+                                                $_GET['language_code']));
+    }  
+    $vNetworkKey = NULL;
+    if (isset($_GET['unpk'])) {
+        $stripper->offsetSet('unpk', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                                                $app,
+                                                $_GET['unpk']));
+    }   
+    $stripper->strip();
+    if ($stripper->offsetExists('language_code')) {
+        $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+    }     
+    if ($stripper->offsetExists('unpk')) {
+        $vNetworkKey = $stripper->offsetGet('unpk')->getFilterValue();
+    }      
+    $resDataGrid = $BLL->fillUsersInformationNpk(array(
+        'url' => $_GET['url'],  
+        'language_code' => $vLanguageCode,
+        'network_key' => $vNetworkKey,  
+        'pk'=> $pk,
+    ));
+     
+    $flows = array();
+    if (isset($resDataGrid[0]['unpk'])) { 
+    foreach ($resDataGrid as $flow) {
+        $flows[] = array(            
+            "unpk" => $flow["unpk"],
+            "registration_date" => $flow["registration_date"],
+            "name" => html_entity_decode($flow["name"]),
+            "surname" => html_entity_decode($flow["surname"]),
+            "auth_email" => $flow["auth_email"],
+            "user_language" => html_entity_decode($flow["user_language"]),
+            "npk" => $flow["npk"],  
+            "firm_name" => html_entity_decode($flow["firm_name"]),
+            "firm_name_eng" => html_entity_decode($flow["firm_name_eng"]),
+            "title" => html_entity_decode($flow["title"]),  
+            "title_eng" => html_entity_decode($flow["title_eng"]),  
+            "userb" => html_entity_decode($flow["userb"]), 
+            "attributes" => array("notroot" => true, ), 
+        );
+        }
+     }
+    $app->response()->header("Content-Type", "application/json");
+    $resultArray = array();
+    $resultArray['rows'] = $flows;
+    $app->response()->body(json_encode($resultArray));
+});
+ 
+/**
+ *  * Okan CIRAN
+ * @since 09-09-2016
+ */
+$app->get("/pkInsertConsultant_infoUsers/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('infoUsersBLL');
+    $headerParams = $app->request()->headers(); 
+    if (!isset($headerParams['X-Public'])) {
+        throw new Exception('rest api "pkInsertConsultant_infoUsers" end point, X-Public variable not found');
+    }
+    $pk = $headerParams['X-Public'];   
+ 
+    $vPreferredLanguage = 647;
+    if (isset($_GET['preferred_language'])) {
+        $stripper->offsetSet('preferred_language', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['preferred_language']));
+    }
+    $vRoleId = 0;
+    if (isset($_GET['role_id'])) {
+        $stripper->offsetSet('role_id', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['role_id']));
+    }
+    $vOsbId = 0;
+    if (isset($_GET['osb_id'])) {
+        $stripper->offsetSet('osb_id', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['osb_id']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                $app, $_GET['surname']));
+    }
+    $vUsername = NULL;
+    if (isset($_GET['username'])) {
+        $stripper->offsetSet('username', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['username']));
+    }     
+    $vAuthEmail = NULL;
+    if (isset($_GET['auth_email'])) {
+        $stripper->offsetSet('auth_email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['auth_email']));
+    }
+    $vPreferredLanguageJson = NULL;
+    if (isset($_GET['preferred_language_json'])) {
+        $stripper->offsetSet('preferred_language_json', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_JASON_LVL1, 
+                $app, $_GET['preferred_language_json']));
+    }
+    $vTitle = NULL;
+    if (isset($_GET['title'])) {
+        $stripper->offsetSet('title', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['title']));
+    }
+    $vTitleEng = NULL;
+    if (isset($_GET['title_eng'])) {
+        $stripper->offsetSet('title_eng', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['title_eng']));
+    }
+
+    $stripper->strip();
+    
+    if ($stripper->offsetExists('role_id')) {
+        $vRoleId = $stripper->offsetGet('role_id')->getFilterValue();
+    }
+    if ($stripper->offsetExists('osb_id')) {
+        $vOsbId = $stripper->offsetGet('osb_id')->getFilterValue();
+    }
+    if ($stripper->offsetExists('preferred_language')) {
+        $vPreferredLanguage = $stripper->offsetGet('preferred_language')->getFilterValue();
+    }
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    }
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    }
+    if ($stripper->offsetExists('username')) {
+        $vUsername = $stripper->offsetGet('username')->getFilterValue();
+    }    
+    if ($stripper->offsetExists('auth_email')) {
+        $vAuthEmail = $stripper->offsetGet('auth_email')->getFilterValue();
+    }
+    if ($stripper->offsetExists('title')) {
+        $vTitle = $stripper->offsetGet('title')->getFilterValue();
+    }
+    if ($stripper->offsetExists('title_eng')) {
+        $vTitleEng = $stripper->offsetGet('title_eng')->getFilterValue();
+    }
+    if ($stripper->offsetExists('preferred_language_json')) {
+        $vPreferredLanguageJson = $stripper->offsetGet('preferred_language_json')->getFilterValue();
+    }
+    
+    $resDataInsert = $BLL->insertConsultant(array(
+        'url' => $_GET['url'],  
+        'pk' => $pk,
+        'role_id' => $vRoleId,
+        'osb_id' => $vOsbId,
+        'name' => $vName,
+        'surname' => $vSurname,
+        'username' => $vUsername,      
+        'auth_email' => $vAuthEmail,
+        'title' => $vTitle,
+        'title_eng' => $vTitleEng,
+        'preferred_language' => $vPreferredLanguage,
+        'preferred_language_json' => $vPreferredLanguageJson,        
+    ));
+    $app->response()->header("Content-Type", "application/json");
+    $app->response()->body(json_encode($resDataInsert));
+}
+);
+
+/**
+ * Okan CIRAN
+ * @since 31-09-2016
+ */
+$app->get("/pkInsertUrgePerson_infoUsers/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('infoUsersBLL');
+    $headerParams = $app->request()->headers(); 
+    if (!isset($headerParams['X-Public'])) {
+        throw new Exception('rest api "pkInsertConsultant_infoUsers" end point, X-Public variable not found');
+    }
+    $pk = $headerParams['X-Public'];   
+  
+    $vRoleId = 0;
+    if (isset($_GET['role_id'])) {
+        $stripper->offsetSet('role_id', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['role_id']));
+    }
+    $vClusterId = 0;
+    if (isset($_GET['cluster_id'])) {
+        $stripper->offsetSet('cluster_id', $stripChainerFactory->get(stripChainers::FILTER_ONLY_NUMBER_ALLOWED, 
+                $app, $_GET['cluster_id']));
+    }
+    $vName = NULL;
+    if (isset($_GET['name'])) {
+        $stripper->offsetSet('name', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['name']));
+    }
+    $vSurname = NULL;
+    if (isset($_GET['surname'])) {
+        $stripper->offsetSet('surname', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2,
+                $app, $_GET['surname']));
+    } 
+    $vAuthEmail = NULL;
+    if (isset($_GET['auth_email'])) {
+        $stripper->offsetSet('auth_email', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['auth_email']));
+    } 
+
+    $stripper->strip();    
+    if ($stripper->offsetExists('role_id')) {
+        $vRoleId = $stripper->offsetGet('role_id')->getFilterValue();
+    }
+    if ($stripper->offsetExists('cluster_id')) {
+        $vClusterId = $stripper->offsetGet('cluster_id')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('name')) {
+        $vName = $stripper->offsetGet('name')->getFilterValue();
+    }
+    if ($stripper->offsetExists('surname')) {
+        $vSurname = $stripper->offsetGet('surname')->getFilterValue();
+    } 
+    if ($stripper->offsetExists('auth_email')) {
+        $vAuthEmail = $stripper->offsetGet('auth_email')->getFilterValue();
+    }      
+    
+    $resDataInsert = $BLL->InsertUrgePerson(array(
+        'url' => $_GET['url'],  
+        'pk' => $pk,
+        'role_id' => $vRoleId,
+        'cluster_id' => $vClusterId,
+        'name' => $vName,
+        'surname' => $vSurname,            
+        'auth_email' => $vAuthEmail,
+        'username' => $vAuthEmail, 
+    ));
+    $app->response()->header("Content-Type", "application/json");
+    $app->response()->body(json_encode($resDataInsert));
+}
+);
+
+ 
+/**
+ *  * Okan CIRAN
+ * @since 02-09-2016
+ */
+$app->get("/setPersonPassword_infoUsers/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory();
+    $BLL = $app->getBLLManager()->get('infoUsersBLL'); 
+    $vM = NULL;
+    if (isset($_GET['m'])) {
+        $stripper->offsetSet('m', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['m']));
+    }
+    $vA = NULL;
+    if (isset($_GET['a'])) {
+        $stripper->offsetSet('a', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['a']));
+    }
+    $vKey = NULL;
+    if (isset($_GET['key'])) {
+        $stripper->offsetSet('key', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL2, 
+                $app, $_GET['key']));
+    }    
+    $vPassword = NULL;
+    if (isset($_GET['password'])) {
+        $stripper->offsetSet('password', $stripChainerFactory->get(stripChainers::FILTER_PARANOID_LEVEL1, 
+                $app, $_GET['password']));
+    }
+
+    $stripper->strip();
+    if ($stripper->offsetExists('m')) {
+        $vM = $stripper->offsetGet('m')->getFilterValue();
+    }
+    if ($stripper->offsetExists('a')) {
+        $vA = $stripper->offsetGet('a')->getFilterValue();
+    }
+    if ($stripper->offsetExists('key')) {
+        $vKey = $stripper->offsetGet('key')->getFilterValue();
+    }    
+    if ($stripper->offsetExists('password')) {
+        $vPassword = $stripper->offsetGet('password')->getFilterValue();
+    }
+   
+    $resDataInsert = $BLL->setPersonPassword(array( 
+        'url' => $_GET['url'], 
+        'm' => $vM,    
+        'a' => $vA,    
+        'key' => $vKey,        
+        'password' => $vPassword,        
+        ));
+    $app->response()->header("Content-Type", "application/json");
+    $app->response()->body(json_encode($resDataInsert));
+}
+);
 
 $app->run();

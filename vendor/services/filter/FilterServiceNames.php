@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -31,6 +31,9 @@ final class FilterServiceNames {
     const FILTER_ONLY_BOOLEAN_ALLOWED = 'filterOnlyBoolean';
     const FILTER_ONLY_STATE_ALLOWED = 'filterOnlyState';
     const FILTER_ONLY_LANGUAGE_CODE = 'filterOnlyLanguageCode';
+    const FILTER_ONLY_ORDER = 'filterOnlyOrder';
+    
+    
     
     const FILTER_SQL_RESERVEDWORDS = 'filterSQLReservedWords';
        

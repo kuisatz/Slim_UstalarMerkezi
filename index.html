@@ -7,1488 +7,312 @@ and open the template in the editor. Ğİ
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-        <!-- Loading Flat UI -->
-        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
-        <link href="themes/bootstrap/easyui.css" rel="stylesheet">
-
-
-        <script src="js/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
-        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
-
-    </head>
-    <body>
-        <script>
-            jQuery(document).ready(function () {
-
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'getDynamicForm_test',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    type: 'GET',
-                    dataType: 'html',
-                    success: function (data, textStatus, jqXHR) {
-
-                        $('.result').html(data);
-                        //$('.result').append(data);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-                $('#tt_grid').datagrid({
-                    onSelect: function () {
-
-                    },
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    //url :'index.php/getReports_rpt',
-                    queryParams: {
-                        url: 'getReports_test',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    method: 'GET',
-                    sortName: 'r_date',
-                    collapsible: true,
-                    idField: 'id',
-                    //toolbar:'#tb',
-                    rownumbers: "true",
-                    pagination: "true",
-                    remoteSort: true,
-                    multiSort: true,
-                    singleSelect: true,
-                    columns: [[
-                            {field: 'report_name', title: 'Report Name', width: 100, sortable: true},
-                            {field: 'r_date', title: 'Report Date', width: 100, sortable: true},
-                            {field: 'company_name', title: 'Company', width: 100, sortable: true},
-                            {field: 'company_id', title: 'Company ID', width: 100, sortable: true, hidden: true},
-                            {field: 'user_name', title: 'User Name', width: 100},
-                            {field: 'name', title: 'Name', width: 100},
-                            {field: 'surname', title: 'Surname', width: 100},
-                        ]],
-                });
-                
-        
-        
-              //pkInsert_logAdmin
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_logAdmin',
-                        pk: 'HM7zFCAUq6NaTGc',                    
-                        op_type_id: 1  ,        
-                        urlx:'http://slim.sanalfabrika.com:9990' , 
-                        path: '/syslanguage.php/fillComboBox_syslanguage',
-                        ip:'127.0.0.1' ,
-                        params:'a:2:{s:3:"url";s:24:"fillComboBox_syslanguage";s:13:"language_code";s:2:"en";}' ,
-                        log_datetime : '2016-02-22 04:00:00',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                }); 
-        
-          //pkInsert_logConsultant
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_logConsultant',
-                        pk: 'bJYzd6OTHYM619U',                    
-                        op_type_id: 1  ,        
-                        urlx:'http://slim.sanalfabrika.com:9990' , 
-                        path: '/syslanguage.php/fillComboBox_syslanguage',
-                        ip:'127.0.0.1' ,
-                        params:'a:2:{s:3:"url";s:24:"fillComboBox_syslanguage";s:13:"language_code";s:2:"en";}' ,
-                        log_datetime : '2016-02-22 04:00:00',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                }); 
-      
-    //pkInsert_logUser
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_logUser',
-                        pk: 'bJYzd6OTHYM619U',                    
-                        op_type_id: 1  ,        
-                        urlx:'http://slim.sanalfabrika.com:9990' , 
-                        path: '/syslanguage.php/fillComboBox_syslanguage',
-                        ip:'127.0.0.1' ,
-                        params:'a:2:{s:3:"url";s:24:"fillComboBox_syslanguage";s:13:"language_code";s:2:"en";}' ,
-                        log_datetime : '2016-02-22 04:00:00',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-        
-      //pkInsert_logConnection
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_logConnection',
-                        pk: 'HM7zFCAUq6NaTGc',
-                        type_id: 42,
-                        log_datetime : '2016-02-22 04:00:00',
-                        urlx: 'http://slim.sanalfabrika.com:9990',                        
-                        path: '/syslanguage.php/fillComboBox_syslanguage',                        
-                        ip:'127.0.0.1' ,
-                        params:'a:2:{s:3:"url";s:24:"fillComboBox_syslanguage";s:13:"language_code";s:2:"en";}' ,
-                        method:'zzzz' ,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
      
-     
-     
-      //pkFillGrid_sysUnspscCodes 
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillGrid_sysUnspscCodes',
-                        pk: 'YUJmiRTu6dX3QBk',
-                        page: '',
-                        rows: '',
-                        sort: '',
-                        order: '', 
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
 
-            
-   //pkFillGrid_logConnection
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillGrid_logConnection',
-                        pk: 'ZODzkAyOcSa3cA.',
-                        page: '',
-                        rows: '',
-                        sort: '',
-                        order: '', 
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+    <!-- Loading Flat UI -->
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="themes/bootstrap/easyui.css" rel="stylesheet">
+    
 
-          
-        //pkGetDashBoardHighCharts_blAdminActivationReport
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetDashBoardHighCharts_blAdminActivationReport',
-                        pk: 'TOWoUfx643j70SM',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-            
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    
+</head>
+<body>
+<script>
+    jQuery(document).ready(function() {
         
-     //pkFillNaceCodes_sysNaceCodes
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillNaceCodes_sysNaceCodes',
-                        pk: 'RnAFOe3vAnwWL3g',
-                        language_code: 'tr',
-                        parent_id: 0,
-                        
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+        $.ajax({
+            url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+            data : {
 
-        
-     //pkInsert_infoFirmMachineTool
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_infoFirmMachineTool',
-                        pk: 'tGLPshei8yUuYac',
-                        language_code: 'tr',
-                        profile_public: 0,
-                        availability_id: 0,                       
-                        machine_id: 12,
-                        
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+                    url : 'getDynamicForm_test',
+                    pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            type: 'GET',
+            dataType : 'html',
+            success: function(data, textStatus, jqXHR) {
+
+                 $('.result').html(data);
+                 //$('.result').append(data);
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
 
         
         
         
         
-                /////////////pktempInsert_infoFirmProfile
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pktempInsert_infoFirmProfile',
-                        pktemp: '*7ai.m.DcUN5UCU',
-                        language_code: 'tr',
-                        profile_public: 0,
-                        country_id: 91,
-                        ownership_status_id: 1,
-                        firm_name: 'xyz3 kalıp ve döküm a.ş.',
-                        firm_name_sort: 'xyz kalıp',
-                        tax_office:'Ostim',
-                        tax_no: '4910265741',
-                        sgk_sicil_no: '225940101111057700621_92',
-                        foundation_year: '2016-01-19',
-                        duns_number: '11-222-3333',
-                        description: 'firmamız kalıp ve döküm işlerinizi itinayla yapar. ',
-                        web_address: 'www.xyzkalipcilik.com'
-                     
-                        
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });        
-                
-            //////pkFillUsersFirmMachineProperties_infoFirmMachineTool
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillUsersFirmMachineProperties_infoFirmMachineTool',
-                        pk: 'ffnzQfj7XtYxWvU',
-                        language_code: 'tr',
-                        machine_id: 11, 
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });   
-                
-       //////pkInsert_hstryLogin
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_hstryLogin',
-                        pk: 'ucWnC3NQDhsc.Ts',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });            
-       //////pkFillJustMachineToolGroups_sysMachineToolGroups
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillJustMachineToolGroups_sysMachineToolGroups',
-                        pk: '2zKz4L4mc*oOcxM',
-                        language_code: 'tr',  
-                        parent_id: 2,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });   
-                   //////pkFillMachineToolGroupsMachineProperties_sysMachineToolGroups
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillMachineToolGroupsMachineProperties_sysMachineToolGroups',
-                        pk: 'ffnzQfj7XtYxWvU',
-                        language_code: 'en',
-                        machine_id: 11, 
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });   
-                   
-        
-           //////pkFillUsersFirmMachines_infoFirmMachineTool
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillUsersFirmMachines_infoFirmMachineTool',
-                        pk: 'tGLPshei8yUuYac',
-                        language_code: 'de',
-                     //   id: 11, 
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });   
-                
-                
-                
-     //////pkFillMachineToolGroupPropertyDefinitions_sysMachineToolPropertyDefinition
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillMachineToolGroupPropertyDefinitions_sysMachineToolPropertyDefinition',
-                        pk: 'E235XLHOeoQgVJ2',
-                        language_code: 'tr',
-                        machine_tool_grup_id: 5, 
-                        
-
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });             
-                
-         //////pkFillMachineToolGroups_sysMachineToolGroups
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillMachineToolGroups_sysMachineToolGroups',
-                        pk: 'pJPdNzOCE1Gs*iA',
-                        parent_id: 0
-
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });       
-                
-                         //////pkFillMachineToolFullProperties_sysMachineToolProperties
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillMachineToolFullProperties_sysMachineToolProperties',
-                        pk: '6TJDRKXZvl0fIXM',
-                        language_code: 'tr',
-                        parent_id: 0
-
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });   
-//////pkFillConsultantOperationsToolsDropDown_sysOperationTypesTools
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_infoError',                        
-                        pk: 'muQoxXUAf3Lt*9Q',
-                        
-                        error_code: '$1239908',
-                        error_info: 'bi hata gördüm sanki',
-                        url_full: 'www.x.com',
-                        service_name :'deneme servisi',
-                        page_name: 'bıttırık sayfası',
-                        
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });                
-                
-                
-//////pkFillConsultantOperationsToolsDropDown_sysOperationTypesTools
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillConsultantOperationsToolsDropDown_sysOperationTypesTools',                        
-                        pk: '0klxTsWpluRUibA',
-                        language_code: 'tr'
-                       
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+    $('#tt_grid').datagrid({
+             onSelect : function () {
  
-
- //////pktempFillGridSingular_infoUsersAddresses
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pktempFillGridSingular_infoUsersAddresses',                        
-                        pktemp: 'KG2K.rJyCJIL1t2',
-                        language_code: 'tr'
-                       
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                
-    //////pktempFillGridSingular_infoUsersAddresses
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillConsultantOperationsDropDown_sysOperationTypes',
-                        language_code: 'tr',
-                        main_group: 2,
-                        pk : 'ZO6jtZluOMe2fcU'
-                       
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });             
-    //////pkFillGrid_sysMachineToolProperties
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillGrid_sysMachineToolProperties',
-                        pk: 'E235XLHOeoQgVJ2',
-                        language_code: 'tr',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });            
-
-  //////pkGetAll_sysOsb
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetAll_sysOsb',
-                        pk: 'KG2K.rJyCJIL1t2',
-                       
-                       
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-
-  //////pkGetConsPendingFirmProfile_sysOsbConsultants
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetConsPendingFirmProfile_sysOsbConsultants',
-                        pk: 'KG2K.rJyCJIL1t2',
-                        page: '',
-                        rows: '',
-                        sort: '',
-                        order: '',                   
-                        language_code: 'tr'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-
-  //////pkFillSingularFirmMachineTools_infoFirmMachineTool
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillSingularFirmMachineTools_infoFirmMachineTool',
-                        pk: 'QTcBUClxQ97bmg2',
-                        page: '',
-                        rows: '',
-                        sort: '',
-                        order: '',                   
-                        language_code: 'tr'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-  //////getConsultantOperation_blActivationReport
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetConsultantOperation_blActivationReport',
-                        pk: 'sSLmv0uDU.VRup2',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-  //////getAllFirmCount_blActivationReport
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'getAllFirmCount_blActivationReport',
+             },
+             url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+            //url :'index.php/getReports_rpt',
+            queryParams : { 
+                            url : 'getReports_test',
+                            pk : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+                          },
+            method : 'GET',
+            sortName : 'r_date',
+            collapsible:true,
+            idField:'id',
+            //toolbar:'#tb',
+            rownumbers: "true",
+            pagination: "true",
+            remoteSort : true,
+            multiSort : true,
+            singleSelect : true,
+            columns:[[
+                {field:'report_name',title:'Report Name',width:100,sortable:true},
+                {field:'r_date',title:'Report Date',width:100,sortable:true},
+                {field:'company_name',title:'Company',width:100,sortable:true},
+                {field:'company_id',title:'Company ID',width:100,sortable:true,hidden:true},
+                {field:'user_name',title:'User Name',width:100},
+                {field:'name',title:'Name',width:100},
+                {field:'surname',title:'Surname',width:100},
+            ]],
+    });
+    
+    
+     $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+     url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+            data : {                              
+                    pk : 'VjLzfZK*B99MP7E',
+                    url : 'pkSessionControl_blLoginLogout',
                     
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });     
-  //////pkGetConsultantUpDashBoardCount_blActivationReport
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetConsultantUpDashBoardCount_blActivationReport',
-                        pk: 'fe52urFGH*ZJKhU',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });                  
-          //////pkGetConsWaitingForConfirm_blActivationReport
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetConsWaitingForConfirm_blActivationReport',
-                        pk: 'fe52urFGH*ZJKhU',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });             
-                                
+            },
+            method : 'GET',
+        
+            success: function(data, textStatus, jqXHR) {
+
                 
- //////pkGetConsultantFirmCount_blActivationReport
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
 
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetConsultantFirmCount_blActivationReport',
-                        pk: 'sSLmv0uDU.VRup2'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+    
+    
+    
+    
+    $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+         
+              url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+            data : {  
+                   country_id :91 ,
+                   city_id : 66 ,
+                   boroughs_id : 738 ,
+                   language_code : 'tr',
+                   url : 'fillComboBox_sysvillage',
+                   pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            method : 'GET',
+        
+            success: function(data, textStatus, jqXHR) {
 
+                
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
+    
+    
+    
+    
+    $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+         
+              url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+            data : {                
+                   url : 'fillComboBox_syslanguage',
+                   pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            method : 'GET',
+        
+            success: function(data, textStatus, jqXHR) {
+
+                
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
+    
+    
+    $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+     url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+            data : {
+                    parent : 0 ,
+                    language_code : 'tr',
+                    pk : 'Cl68lRxFidrIT4o',
+                    url : 'getLeftMenu_leftnavigation',
+                    
+            },
+            method : 'GET',
+        
+            success: function(data, textStatus, jqXHR) {
+
+                
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
+
+    $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+    url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php', 
+            data : {                
+                   url : 'getLeftMenuFull_leftnavigation',
+                   pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            method : 'GET',
+        
+            success: function(data, textStatus, jqXHR) {
+
+                
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
         
         
+    $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+         url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+            data : {
+                    parent : 0 ,
+                    url : 'fillComboBox_syscountryssilinecek',
+                   pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            method : 'GET',
         
-  //////pkFillUserAddressesTypes_infoUsersAddresses
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+            success: function(data, textStatus, jqXHR) {
 
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillUserAddressesTypes_infoUsersAddresses',
-                        pk: 'sSLmv0uDU.VRup2',
-                        language_code: 'tr'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-  //////pktempFillUserAddressesTypes_infoUsersAddresses
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+             
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
+        
+    $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+       url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php', 
+            data : {
+                   country_id : 91,  
+                   language_code : 'tr',
+                   url : 'fillComboBox_syscity',
+                   pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+                                  
+            },
+            method : 'GET',
+            
+        
+            success: function(data, textStatus, jqXHR) {
 
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pktempFillUserAddressesTypes_infoUsersAddresses',
-                        pk: 'EPh03DCerblNt3Y',
-                        language_code: 'tr'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-
-  //////pkFillGrid_sysAclResources
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillGrid_infoUsersAddresses',
-                        pk: 'I2NQfHzWxskQnII',
-                        page: '11',
-                        rows: '50',
-                        sort: '',
-                        order: '',
-                        searchname: '',
-                        language_code: 'tr'
-
-
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                
-                
-                
-      /////////pkFillUnspscCodesTree_sysUnspscCodes
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillUnspscCodesTree_sysUnspscCodes',  
-                        pk: '6LAoh6Qi7LueadI',
-                        language_code: 'tr',                      
-                        id: 0
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });    
-               
+             
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
    
-            /////////pkFillUnitsTree_sysUnits
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+    $.ajax({
+    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+     url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
+      data : {            
+             language_code : 'tr',
+             url : 'fillComboBox_sysborough',
+             pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348',
+             country_id : 91 ,    
+             city_id : 35   
+      },
+      method : 'GET',
 
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillUnitsTree_sysUnits',  
-                        pk: 'QLWxLKlQEeVMeio',
-                        language_code: 'tr',                      
-                        id: 0
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });    
-               
-   
-       
-     /////////pkGetUnspscCodes_sysUnspscCodes
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
 
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetUnspscCodes_sysUnspscCodes',                    
-                        language_code: 'tr',
-                        pk: '6LAoh6Qi7LueadI',
-                        id: 0
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });   
+      success: function(data, textStatus, jqXHR) {
+
+
+      },
+      error: function(jqXHR , textStatus, errorThrown) {
+        console.warn('error text status-->'+textStatus);
+      }
+  });  
+
+      $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+      url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php', 
+            data : {                   
+                language_code : 'tr',
+                url : 'fillComboBox_syscountrys',
+                pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            method : 'GET',
         
-/////////pkGetUnits_sysUnits
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+            success: function(data, textStatus, jqXHR) {
 
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkGetUnits_sysUnits',                    
-                        language_code: 'tr',
-                        pk: 'UK8H2EYKJHka0Jc',
-                        main: 2
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+             
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
 
-
-                //////pkFillGrid_sysAclResources
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillGrid_sysAclResources',
-                        pk: 'I2NQfHzWxskQnII',
-                        page: '11',
-                        rows: '50',
-                        sort: '',
-                        order: '',
-                        searchname: 'asd',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-/////////fillOwnershipType_sysSpecificDefinitions
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'fillOwnershipType_sysSpecificDefinitions',                    
-                        language_code: 'tr'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-/////////fillCommunicationsTypes_sysSpecificDefinitions
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'fillCommunicationsTypes_sysSpecificDefinitions',
-                        pk: 'm*0HcW7Yj.xoiIk',
-                        language_code: 'tr'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-
-    //pkDeletedAct_infoFirmMachineTool
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        id: 12,
-                        url: 'pkDeletedAct_infoFirmMachineTool',
-                        pk: 'zql3pqVDN*a0zv6',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                
-
-
-
-                //pkDelete_infoUsers
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        id: 119,
-                        url: 'pkDelete_infoUsers',
-                        pk: 'Lp4VtbruJw3qM6Q',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                
-               
-                //pkDelete_sysAclRoles
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        id: 119,
-                        url: 'pkDelete_sysAclRoles',
-                        pk: 'lO1Rv*2e8IQYqA.',
-                        user_id: 0,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                //pkUpdateChild_sysAclRoles
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        active: 1,
-                        url: 'pkUpdateChild_sysAclRoles',
-                        pk: 'MWfAoy72QsEM5dY',
-                        user_id: 0,
-                        id: 145,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                //pkSessionControl_blLoginLogout
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        pk: 'XfawtGG265OTb3I',
-                        url: 'pkSessionControl_blLoginLogout',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                //pkInsert_sysAclResources
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_sysAclResources',
-                        pk: 'OAailZdzJ1PnLsk',
-                        name: 'abc123qwe',
-                        icon_class: '',
-                        parent: 0,
-                        user_id: 0,
-                        description: 'asdasd',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-///////pkInsert_sysAclRoles
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_sysAclRoles',
-                        pk: 'gHYDAFZxr8vsVUk',
-                        name: 'Select abc',
-                        icon_class: '',
-                        start_date: '',
-                        end_date: '',
-                        parent: 0,
-                        user_id: 0,
-                        description: 'asdasd',
-                        root: 0,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-/////////pkFillComboBoxFullPrivilege_sysAclPrivilege
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillComboBoxFullPrivilege_sysAclPrivilege',
-                        pk: 'GiMdeysyzMBJnG2'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-/////pkFillComboBoxFullResources_sysAclResources
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillComboBoxFullResources_sysAclResources',
-                        pk: 'OAailZdzJ1PnLsk'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-////pkUpdate_sysAclRoles
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        id: 20,
-                        url: 'pkUpdate_sysAclRoles',
-                        pk: '7ey7ZSTDi*pb.R.',
-                        name: '. /.,',
-                        icon_class: '',
-                        active: 0,
-                        start_date: '',
-                        end_date: '',
-                        parent: 0,
-                        user_id: 0,
-                        description: 'asdasd',
-                        root: 0,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-//////pkFillGrid_sysAclRoles
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillGrid_sysAclRoles',
-                        pk: '7ey7ZSTDi*pb.R.',
-                        page: '',
-                        rows: '',
-                        sort: '',
-                        order: '',
-                        search_name: '',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-//////pkFillComboBoxFullRoles_sysAclRoles
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkFillComboBoxFullRoles_sysAclRoles',
-                        pk: 'sSLmv0uDU.VRup2',
-                        id: 0
-
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-///////fillComboBox_sysvillage
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        country_id: 91,
-                        city_id: 66,
-                        boroughs_id: 738,
-                        language_code: 'tr',
-                        url: 'fillComboBox_sysvillage',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-////////fillGridRowTotalCount_infoFirmProfile
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        language_code: 'tr',
-                        url: 'fillGridRowTotalCount_infoFirmProfile',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-/////////fillComboBox_syslanguage
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'fillComboBox_syslanguage',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        parent: 0,
-                        language_code: 'tr',
-                        pk: 'Cl68lRxFidrIT4o',
-                        url: 'pkGetLeftMenu_leftnavigation',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        country_id: 91,
-                        language_code: 'tr',
-                        url: 'fillComboBox_syscity',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        language_code: 'tr',
-                        url: 'fillComboBox_sysborough',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348',
-                        country_id: 91,
-                        city_id: 35
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        language_code: 'tr',
-                        url: 'fillComboBox_syscountrys',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-
-                /////////////tempInsert_infoUsers
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'tempInsert_infoUsers',
-                        //     pk: 'V1EtzHfupT5om2A',
-                        profile_public: 0,
-                        name: 'zz99',
-                        surname: 'zz99',
-                        username: 'zz99@gmail.com',
-                        password: '123',
-                        auth_email: 'zz339@gmail.com',
-                        language_code: 'tr',
-                        preferred_language: 'tr',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-                
-                /////////////tempUpdate_infoUsers
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pktempUpdate_infoUsers',             
-                        profile_public: 0,
-                        name: 'zz99',
-                        surname: 'zz99',
-                        username: 'acb@gmail.com',
-                        password: 'rrr',
-                        auth_email: 'acb@gmail.com',
-                        language_code: 'tr',
-                        preferred_language: 647,
-                        pktemp: 'S5e0PLAPpdXNdBo',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-/////////////pktempInsert_infoUsersAddresses
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pktempInsert_infoUsersAddresses',
-                        pktemp: 'V1EtzHfupT5om2A',
-                        profile_public: 0,
-                        language_code: 'tr',
-                        operation_type_id: 1,
-                        address_type_id: 1,
-                        address1: 'incirli mah. 103 sok. xyz apt. a blok ',
-                        address2: ' no 7 d: 11 xxyyx yxyxyxyx yx y',
-                        postal_code: '06350',
-                        country_id: 91,
-                        city_id: 6,
-                        borough_id: 558,
-                        city_name: '',
-                        description: 'zıttırı pıttırı  ',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-            /////////////pktempUpdate_infoUsersAddresses
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pktempUpdate_infoUsersAddresses',
-                        pktemp: 'V1EtzHfupT5om2A',
+      $.ajax({
+          //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
+           url :'../Slim_Proxy_SanalFabrika/SlimProxyBoot.php', 
+            data : {
                    
-                        profile_public: 0,
-                        language_code: 'tr',
-                        operation_type_id: 2,
-                        address_type_id: 2,
-                        address1: 'incirli mah. 103 sok. xyz apt. a blok ',
-                        address2: ' no 7 d: 11 xxyyx yxyxyxyx yx y',
-                        postal_code: 'exd lt11',
-                        country_id: 128,
-                        city_id: 0,
-                        borough_id: 0,
-                        city_name: 'Berlin',
-                        description: ' pıttırı  zıttırı',
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
+                    language_code : 'tr',
+                    url : 'fillGrid_infoUsers',
+                    pk  : '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
+            },
+            method : 'GET',
+        
+            success: function(data, textStatus, jqXHR) {
 
+                
+            },
+            error: function(jqXHR , textStatus, errorThrown) {
+              console.warn('error text status-->'+textStatus);
+            }
+        });  
+    
+    
 
-                /////////////pkInsert_infoUsers
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkInsert_infoUsers',
-                        pk: 'V1EtzHfupT5om2A',
-                        profile_public: 0,
-                        name: 'zz',
-                        surname: 'zz',
-                        username: 'zz@gmail.com',
-                        password: '123',
-                        auth_email: 'zz1@gmail.com',
-                        language_code: 'tr',
-                        cons_allow_id: 0,
-                        preferred_language: 'tr',
-                        operation_type_id: 1,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-                /////////////pkUpdate_infoUsers
-                $.ajax({
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        url: 'pkUpdate_infoUsers',
-                        pk: 'V1EtzHfupT5om2A',
-                        pktemp: 'V1EtzHfupT5om2A',
-                        id: '5',
-                        profile_public: 0,
-                        name: 'zz',
-                        surname: 'zz',
-                        username: 'zz@gmail.com',
-                        password: '123',
-                        auth_email: 'zz1@gmail.com',
-                        language_code: 'tr',
-                        cons_allow_id: 0,
-                        preferred_language: 'tr',
-                        personIdNumber: '123123123123123',
-                        operation_type_id: 2,
-                        active: 0,
-                        act_parent_id: 0,
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-///////////////////fillGridRowTotalCount_infoUsers 
-                $.ajax({
-                    //  url : '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',   
-                    url: '../Slim_Proxy_SanalFabrika/SlimProxyBoot.php',
-                    data: {
-                        language_code: 'tr',
-                        url: 'fillGridRowTotalCount_infoUsers',
-                        pk: '3441df0babc2a2dda551d7cd39fb235bc4e09cd1e4556bf261bb49188f548348'
-                    },
-                    method: 'GET',
-                    success: function (data, textStatus, jqXHR) {
-
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.warn('error text status-->' + textStatus);
-                    }
-                });
-
-
-
-            });
-
-        </script>
+});
+    
+</script>
 
         <div id="p2" class="easyui-panel"  
-             title="Reports already prepared" 
-             style="margin: auto 0;height:350px;"
-             data-options="iconCls:'icon-save',collapsible:true,closable:true">
-            <table id="tt_grid" data-options="" 
-                   title="Company Report Sets" 
-                   contenteditable="" style="height:440px;" 
-                   accesskey="">
-            </table>
-
-        </div>
+            title="Reports already prepared" 
+            style="margin: auto 0;height:350px;"
+           data-options="iconCls:'icon-save',collapsible:true,closable:true">
+           <table id="tt_grid" data-options="" 
+                  title="Company Report Sets" 
+                      contenteditable="" style="height:440px;" 
+             accesskey="">
+           </table>
+            
+       </div>
         <div class="result">
 
         </div>
 
-    </body>
+</body>
 </html>

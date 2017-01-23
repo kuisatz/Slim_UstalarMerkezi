@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -50,7 +50,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
             } else {
                 $errorInfo = '23502';  /// 23502  not_null_violation
                 $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '');
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '');
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -160,68 +160,71 @@ class InfoUsersCommunications extends \DAL\DalSlim {
      * @throws \PDOException
      */
     public function insert($params = array()) {
-        try {
+        try {   
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $pdo->beginTransaction();
-            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));
+            $pdo->beginTransaction();            
+            $opUserIdParams = array('pk' =>  $params['pk'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserId($opUserIdParams);
             if (!\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];
-                $addSql = " op_user_id, ";
-                $addSqlValue = " " . $opUserIdValue . ",";
-                $addSql .= " user_id,  ";
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];   
+                $opUserRoleIdValue = $opUserId ['resultSet'][0]['role_id'];                            
+                $url = null;
+                if (isset($params['url']) && $params['url'] != "") {
+                    $url = $params['url'];
+                }    
+                $m = null;
+                if (isset($params['m']) && $params['m'] != "") {
+                    $m = $params['m'];
+                }  
+                $a = null;
+                if (isset($params['a']) && $params['a'] != "") {
+                    $a = $params['a'];
+                }  
+                $operationIdValue =  0;
+                $assignDefinitionIdValue = 0;
+                $operationTypeParams = array('url' => $url, 'role_id' => $opUserRoleIdValue, 'm' => $m,'a' => $a,);                        
+                $operationTypes = $this->slimApp-> getBLLManager()->get('operationsTypesBLL');  
+                $operationTypesValue = $operationTypes->getInsertOperationId($operationTypeParams);
+                if (\Utill\Dal\Helper::haveRecord($operationTypesValue)) { 
+                    $operationIdValue = $operationTypesValue ['resultSet'][0]['id']; 
+                    $assignDefinitionIdValue = $operationTypesValue ['resultSet'][0]['assign_definition_id'];                     
+                }  
                 if ((isset($params['user_id']) && $params['user_id'] != "")) {
                     $userId = $params['user_id'];
                 } else {
                     $userId = $opUserIdValue;
                 }
-                $addSqlValue .= " " . $userId . ",";
-
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-                $addSql .= " language_id,  ";
-                $addSqlValue .= " " . intval($languageIdValue) . ",";
-
-                if ((isset($params['active']) && $params['active'] != "")) {
-                    $addSqlValue .= " " . intval($params['active']) . ",";
-                    $addSql .= " active,  ";
-                }
-
-                $addSql .= " operation_type_id,  ";
-                if ((isset($params['operation_type_id']) && $params['operation_type_id'] != "")) {
-                    $addSqlValue .= " " . intval($params['operation_type_id']) . ",";
-                } ELSE {
-                    $addSqlValue .= " 1,";
-                }
-
-                if ((isset($params['consultant_id']) && $params['consultant_id'] != "")) {
-                    $addSqlValue .= " " . intval($params['consultant_id']) . ",";
-                    $addSql .= " consultant_id,  ";
-                    if ((isset($params['consultant_confirm_type_id']) && $params['consultant_confirm_type_id'] != "")) {
-                        $addSqlValue .= " " . intval($params['consultant_confirm_type_id']) . ",";
-                        $addSql .= " consultant_confirm_type_id,  ";
+              
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }  
+                 
+                $ConsultantId = 1001;
+                if ($operationIdValue > 0) {
+                    $url = null;
+                    $getConsultantParams = array('operation_type_id' => $operationIdValue, 'language_id' => $languageIdValue,);
+                    $getConsultant = $this->slimApp->getBLLManager()->get('beAssignedConsultantBLL');
+                    $getConsultantArray = $getConsultant->getBeAssignedConsultant($getConsultantParams);
+                    if (\Utill\Dal\Helper::haveRecord($getConsultantArray)) {
+                        $ConsultantId = $getConsultantArray ['resultSet'][0]['consultant_id'];
                     }
-
-                    if ((isset($params['confirm_id']) && $params['confirm_id'] != "")) {
-                        $addSqlValue .= " " . intval($params['confirm_id']) . ",";
-                        $addSql .= " confirm_id,  ";
-                    }
-                }
-
-                $getConsultant = SysOsbConsultants::getConsultantIdForUsers(array('category_id' => 1));
-                if (!\Utill\Dal\Helper::haveRecord($getConsultant)) {
-                    $ConsultantId = $getConsultant ['resultSet'][0]['consultant_id'];
-                } else {
-                    $ConsultantId = 1001;
                 }
 
                 $statement = $pdo->prepare("
-                        INSERT INTO info_users_communications (                           
-                                " . $addSql . "                              
-                                language_code,                         
+                        INSERT INTO info_users_communications (
+                                user_id,
+                                op_user_id,
+                                language_id,
+                                operation_type_id,                                
                                 communications_type_id, 
                                 communications_no, 
                                 description, 
@@ -230,10 +233,12 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                                 act_parent_id,
                                 default_communication_id,
                                 consultant_id
-                                )                        
-                        VALUES (
-                                " . $addSqlValue . "                                                                       
-                                :language_code,                         
+                                )
+                        VALUES (                                
+                                " . intval($userId) . ",
+                                " . intval($opUserIdValue) . ",
+                                " . intval($languageIdValue) . ",
+                                " . intval($operationIdValue) . ",                                
                                 :communications_type_id, 
                                 :communications_no, 
                                 :description, 
@@ -243,28 +248,42 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                                 :default_communication_id,
                                 :consultant_id
                                                 ");
-
-                $statement->bindValue(':language_code', $params['language_code'], \PDO::PARAM_STR);
+                
                 $statement->bindValue(':communications_type_id', $params['communications_type_id'], \PDO::PARAM_INT);
                 $statement->bindValue(':communications_no', $params['communications_no'], \PDO::PARAM_STR);
                 $statement->bindValue(':description', $params['description'], \PDO::PARAM_STR);
                 $statement->bindValue(':description_eng', $params['description_eng'], \PDO::PARAM_STR);
                 $statement->bindValue(':profile_public', $params['profile_public'], \PDO::PARAM_INT);
                 $statement->bindValue(':default_communication_id', $params['default_communication_id'], \PDO::PARAM_INT);
-                $statement->bindValue(':consultant_id', $params['consultant_id'], \PDO::PARAM_INT);
+                $statement->bindValue(':consultant_id', $ConsultantId , \PDO::PARAM_INT);
                 $result = $statement->execute();
                 $insertID = $pdo->lastInsertId('info_users_communications_id_seq');
                 $errorInfo = $statement->errorInfo();
                 if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                    throw new \PDOException($errorInfo[0]);
+                    throw new \PDOException($errorInfo[0]); 
+                
+                $consultantProcessSendParams = array(
+                            'op_user_id' => intval($opUserIdValue), // işlemi yapan user
+                            'operation_type_id' => intval($operationIdValue), // operasyon 
+                            'table_column_id' => intval($insertID), // işlem yapılan tablo id si
+                            'cons_id' => intval($ConsultantId), // atanmış olan danısman 
+                            'preferred_language_id' => intval($languageIdValue), // dil bilgisi
+                            'url' => $url,
+                            'assign_definition_id' => $assignDefinitionIdValue, // operasyon atama tipi
+                         );
+                $setConsultantProcessSend = $this->slimApp-> getBLLManager()->get('consultantProcessSendBLL');  
+                $setConsultantProcessSendArray= $setConsultantProcessSend->insert($consultantProcessSendParams);
+                if ($setConsultantProcessSendArray['errorInfo'][0] != "00000" &&
+                        $setConsultantProcessSendArray['errorInfo'][1] != NULL &&
+                        $setConsultantProcessSendArray['errorInfo'][2] != NULL)
+                    throw new \PDOException($setConsultantProcessSendArray['errorInfo']);  
                 $pdo->commit();
-
                 return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);
             } else {
                 $errorInfo = '23502';   // 23502  not_null_violation
                 $errorInfoColumn = 'pk';
-                 $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                $pdo->rollback();
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -294,9 +313,9 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                 communications_no ='" . $params['communications_no'] . "' AS control,
                 CONCAT(communications_no , ' daha önce kayıt edilmiş. Lütfen Kontrol Ediniz !!!' ) AS message                             
             FROM info_users_communications                
-            WHERE user_id = '" . $params['user_id'] . "' AND 
-                LOWER(TRIM(communications_no)) = LOWER(TRIM('" . $params['communications_no'] . "')) 
-                LOWER(TRIM(communications_type_id)) = LOWER(TRIM('" . $params['communications_type_id'] . "'))  
+            WHERE user_id = " . intval($params['user_id']) . " AND 
+                LOWER(TRIM(communications_no)) = LOWER(TRIM('" . $params['communications_no'] . "')) AND
+                LOWER(TRIM(communications_type_id)) = LOWER(TRIM('" .  intval($params['communications_type_id']) . "')) 
                 " . $addSql . "
                 AND active =0
                 AND deleted=0  
@@ -326,99 +345,146 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-            $opUserId = InfoUsers::getUserId(array('pk' => $params['pk']));
-            if (!\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];
-                $this->makePassive(array('id' => $params['id']));
-                if ((isset($params['consultant_id']) && $params['consultant_id'] != "")) {
-                    $addSqlValue .= " " . intval($params['consultant_id']) . ",";
-                    $addSql .= " consultant_id,  ";
-                    if ((isset($params['consultant_confirm_type_id']) && $params['consultant_confirm_type_id'] != "")) {
-                        $addSqlValue .= " " . intval($params['consultant_confirm_type_id']) . ",";
-                        $addSql .= " consultant_confirm_type_id,  ";
+            $opUserIdParams = array('pk' =>  $params['pk'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserId($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];                
+                $this->makePassive(array('id' => $params['id']));                            
+                $opUserRoleIdValue = $opUserId ['resultSet'][0]['role_id'];                 
+                $url = null;
+                if (isset($params['url']) && $params['url'] != "") {
+                    $url = $params['url'];
+                }    
+                $m = null;
+                if (isset($params['m']) && $params['m'] != "") {
+                    $m = $params['m'];
+                }  
+                $a = null;
+                if (isset($params['a']) && $params['a'] != "") {
+                    $a = $params['a'];
+                }  
+                $operationIdValue =  0;
+                $assignDefinitionIdValue = 0;
+                $operationTypeParams = array('url' => $url, 'role_id' => $opUserRoleIdValue, 'm' => $m,'a' => $a,);
+                $operationTypes = $this->slimApp-> getBLLManager()->get('operationsTypesBLL');  
+                $operationTypesValue = $operationTypes->getUpdateOperationId($operationTypeParams);
+                if (\Utill\Dal\Helper::haveRecord($operationTypesValue)) { 
+                    $operationIdValue = $operationTypesValue ['resultSet'][0]['id']; 
+                    $assignDefinitionIdValue = $operationTypesValue ['resultSet'][0]['assign_definition_id'];
+                    if ($operationIdValue > 0) {
+                        $url = null;
                     }
-
-                    if ((isset($params['confirm_id']) && $params['confirm_id'] != "")) {
-                        $addSqlValue .= " " . intval($params['confirm_id']) . ",";
-                        $addSql .= " confirm_id,  ";
-                    }
-                }
-
-                $addSql .= " user_id,  ";
+                }      
                 if ((isset($params['user_id']) && $params['user_id'] != "")) {
                     $userId = $params['user_id'];
                 } else {
                     $userId = $opUserIdValue;
-                }
-                $addSqlValue .= " " . $userId . ",";
+                } 
+                $active  = 0 ;
+                if ((isset($params['active']) && $params['active'] != "")) {
+                    $active = $params['active'];
+                } 
+                $profilePublic  = 0 ;
+                if ((isset($params['profile_public']) && $params['profile_public'] != "")) {
+                    $profilePublic = $params['profile_public'];
+                } 
 
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-                $addSql .= " language_id,  ";
-                $addSqlValue .= " " . intval($languageIdValue) . ",";
-
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }   
+               
                 $statementInsert = $pdo->prepare("
-                INSERT INTO info_users_communications (                                          
+                INSERT INTO info_users_communications (
                         active, 
                         op_user_id, 
-                        operation_type_id, 
-                        language_code,                         
+                        operation_type_id,
                         communications_type_id, 
                         communications_no, 
                         description, 
-                        description_eng,                        
-                        profile_public, 
-                        f_check, 
+                        description_eng,
+                        profile_public,
                         consultant_id,
                         consultant_confirm_type_id, 
                         confirm_id, 
                         act_parent_id, 
                         language_parent_id,
-                        " . $addSql . "                           
+                        user_id,
+                        language_id,
                         act_parent_id,
                         default_communication_id
                         )  
-                SELECT                 
-                    " . intval($params['active']) . " AS active,   
+                SELECT 
+                    " . intval($active) . " AS active,
                     " . intval($opUserIdValue) . " AS op_user_id,  
-                    " . intval($params['operation_type_id']) . " AS operation_type_id,
-                    '" . $params['language_code'] . "' AS language_code,
+                    " . intval($operationIdValue) . " AS operation_type_id,
                     " . intval($params['communications_type_id']) . " AS communications_type_id,
                     '" . $params['communications_no'] . "' AS communications_no,
                     '" . $params['description'] . "' AS description,
                     '" . $params['description_eng'] . "' AS description_eng,
-                    profile_public, 
-                    f_check,                
+                    " . intval($profilePublic) . " AS profile_public,                 
                     consultant_id, 
                     consultant_confirm_type_id, 
                     confirm_id, 
                     act_parent_id, 
                     language_parent_id,
-                     " . $addSqlValue . " 
+                    " . intval($userId) . ",
+                    " . intval($languageIdValue) . ",
                     act_parent_id,
-                    " . intval($params['default_communication_id']) . " AS default_communication_id                    
+                    " . intval($params['default_communication_id']) . " AS default_communication_id 
                 FROM info_users_communications 
-                WHERE id  =" . intval($params['id']) . " 
-                 
+                WHERE id  =" . intval($params['id']) . "                  
                                                 ");
-
                 $result = $statementInsert->execute();
-                $insertID = $pdo->lastInsertId('info_users_communications_id_seq');
-                $errorInfo = $statement->errorInfo();
+                $insertID = $pdo->lastInsertId('info_users_communications_id_seq');               
+                $affectedRows = $statementInsert->rowCount();
+                $errorInfo = $statementInsert->errorInfo();
                 if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                     throw new \PDOException($errorInfo[0]);
 
+                /*
+                * ufak bir trik var. 
+                * işlem update oldugunda update işlemini yapan kişinin dil bilgisini kullanıcaz. 
+                * ancak delete işlemi oldugunda delete işlemini yapan user in dil bilgisini değil 
+                * silinen kaydı yapan kişinin dil bilgisini alıcaz.
+                */
+                 $consIdAndLanguageId = SysOperationTypes::getConsIdAndLanguageId(
+                               array('operation_type_id' =>$operationIdValue, 'id' => $params['id'],));
+                if (\Utill\Dal\Helper::haveRecord($consIdAndLanguageId)) {
+                    $ConsultantId = $consIdAndLanguageId ['resultSet'][0]['consultant_id'];                    
+                    // $languageIdValue = $consIdAndLanguageId ['resultSet'][0]['language_id'];                       
+                }
+ 
+                $consultantProcessSendParams = array(
+                            'op_user_id' => intval($opUserIdValue), // işlemi yapan user
+                            'operation_type_id' => intval($operationIdValue), // operasyon 
+                            'table_column_id' => intval($insertID), // işlem yapılan tablo id si
+                            'cons_id' => intval($ConsultantId), // atanmış olan danısman 
+                            'preferred_language_id' => intval($languageIdValue), // dil bilgisi
+                            'url' => $url,
+                            'assign_definition_id' => $assignDefinitionIdValue, // operasyon atama tipi
+                         );
+                $setConsultantProcessSend = $this->slimApp-> getBLLManager()->get('consultantProcessSendBLL');  
+                $setConsultantProcessSendArray= $setConsultantProcessSend->insert($consultantProcessSendParams);
+                if ($setConsultantProcessSendArray['errorInfo'][0] != "00000" &&
+                        $setConsultantProcessSendArray['errorInfo'][1] != NULL &&
+                        $setConsultantProcessSendArray['errorInfo'][2] != NULL)
+                    throw new \PDOException($setConsultantProcessSendArray['errorInfo']);
                 $pdo->commit();
                 return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $affectedRows);
             } else {
                 $errorInfo = '23502';   // 23502  user_id not_null_violation
                 $errorInfoColumn = 'user_id';
                  $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -427,8 +493,6 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     }
 
     /**
-     * Datagrid fill function used for testing
-     * user interface datagrid fill operation   
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_users_communications tablosundan kayıtları döndürür !!
      * @version v 1.0  01.02.2016
@@ -466,12 +530,17 @@ class InfoUsersCommunications extends \DAL\DalSlim {
             $order = "ASC";
         }
 
-        $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-        if (\Utill\Dal\Helper::haveRecord($languageId)) {
-            $languageIdValue = $languageId ['resultSet'][0]['id'];
-        } else {
-            $languageIdValue = 647;
-        }
+        $languageCode = 'tr';
+        $languageIdValue = 647;
+        if (isset($args['language_code']) && $args['language_code'] != "") {
+            $languageCode = $args['language_code'];
+        }       
+        $languageCodeParams = array('language_code' => $languageCode,);
+        $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+        $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+        if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+             $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+        }   
         $whereSql .= " AND a.language_id =  " . intval($languageIdValue);
 
 
@@ -550,8 +619,6 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     }
 
     /**
-     * Datagrid fill function used for testing
-     * user interface datagrid fill operation   
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_users_communications tablosundan kayıtları döndürür !!
      * @version v 1.0  01.02.2016
@@ -562,17 +629,22 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     public function fillGridSingular($args = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $userId = InfoUsers::getUserId(array('pk' => $args['pk']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                $whereSql = " AND b.user_id = " . $userId ['resultSet'][0]['user_id'];
-
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-                $whereSql .= " AND a.language_id =  " . intval($languageIdValue);
+            $opUserIdParams = array('pk' =>  $params['pk'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserId($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {                
+                $opUserIdValue =  $opUserId ['resultSet'][0]['user_id'];
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($args['language_code']) && $args['language_code'] != "") {
+                    $languageCode = $args['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }   
 
                 $sql = "
                  SELECT 
@@ -608,16 +680,17 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                         when 1 THEN 'Default' 
                     END as default_communication                    
                 FROM info_users_communications  a
-                inner join info_users_detail b on b.root_id = a.user_id and b.active = 0 and b.deleted = 0  
+                inner join info_users_detail b ON b.root_id = a.user_id AND b.active = 0 and b.deleted = 0  
                 INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_id = a.language_id AND sd.deleted = 0 AND sd.active = 0
                 INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_id = a.language_id AND sd1.deleted = 0 AND sd1.active = 0                
                 INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_id = a.language_id AND sd6.deleted = 0 AND sd6.active = 0
                 INNER JOIN sys_language l ON l.id = a.language_id AND l.deleted =0 AND l.active = 0 
 		INNER JOIN info_users u ON u.id = a.op_user_id 
-		INNER JOIN sys_specific_definitions as sd7 on sd7.main_group =14 AND sd7.first_group = a.consultant_confirm_type_id AND sd7.deleted = 0 AND sd7.active = 0 AND sd7.language_id = a.language_id 
-		INNER JOIN sys_operation_types op on op.id = b.operation_type_id AND op.deleted = 0 AND op.active = 0 AND op.language_id = a.language_id              
-                WHERE a.deleted =0 AND a.active =0  
-                " . $whereSql . "
+		INNER JOIN sys_specific_definitions AS sd7 ON sd7.main_group =14 AND sd7.first_group = a.consultant_confirm_type_id AND sd7.deleted = 0 AND sd7.active = 0 AND sd7.language_id = a.language_id 
+		INNER JOIN sys_operation_types op ON op.id = b.operation_type_id AND op.deleted = 0 AND op.active = 0 AND op.language_id = a.language_id              
+                WHERE a.deleted =0 AND a.active =0 AND 
+                      b.user_id = " . intval($opUserIdValue)." AND 
+                      a.language_id =  " . intval($languageIdValue)." 
                 ORDER BY sd6.first_group 
                 ";
                 $statement = $pdo->prepare($sql);
@@ -631,7 +704,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
             } else {
                 $errorInfo = '23502';   // 23502  user_id not_null_violation
                 $errorInfoColumn = 'user_id';         
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             //$debugSQLParams = $statement->debugDumpParams();
@@ -639,8 +712,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * user interface datagrid fill operation get row count for widget
+    /**     
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_users_communications tablosundan çekilen kayıtlarının kaç tane olduğunu döndürür   !!
      * @version v 1.0  01.02.2016
@@ -651,46 +723,39 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     public function fillGridSingularRowTotalCount($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $userId = InfoUsers::getUserId(array('pk' => $args['pk']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                $whereSql = " WHERE a.language_code = '" . $params['language_code'] . "'";
-                $whereSql1 = " WHERE a1.deleted =0 AND a1.language_code = '" . $params['language_code'] . "' ";
-                $whereSql2 = " WHERE a2.deleted =1 AND a2.language_code = '" . $params['language_code'] . "' ";
-
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-                $whereSql .= " AND b.user_id = " . $userIdValue;
-                $whereSql1 .= " AND b1.user_id = " . $userIdValue;
-                $whereSql2 .= " AND b2.user_id = " . $userIdValue;
+            $opUserIdParams = array('pk' =>  $params['pk'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserId($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }                 
+               
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];                          
 
                 $sql = "
                 SELECT 
-                        COUNT(a.id) AS COUNT ,  
-                        (SELECT COUNT(a1.id)  
-                        FROM info_users_communications  a1
-                        inner join info_users_detail b1 on b1.root_id = a1.user_id AND b1.deleted =0 and b1.active =0 
-                        INNER JOIN sys_specific_definitions sdx ON sdx.main_group = 15 AND sdx.first_group= a1.deleted AND sdx.language_code = a1.language_code AND sdx.deleted = 0 AND sdx.active = 0
-                        INNER JOIN sys_specific_definitions sd1x ON sd1x.main_group = 16 AND sd1x.first_group= a1.active AND sd1x.language_code = a1.language_code AND sd1x.deleted = 0 AND sd1x.active = 0                
-                        INNER JOIN sys_specific_definitions sd6x ON sd6x.main_group = 5 AND sd6x.first_group= a1.communications_type_id AND sd6x.language_code = a1.language_code AND sd6x.deleted = 0 AND sd6x.active = 0
-                        INNER JOIN sys_language lx ON lx.language_main_code = a1.language_code AND lx.deleted =0 AND lx.active = 0 
-                        INNER JOIN info_users ux ON ux.id = a1.op_user_id 
-                          " . $whereSql1 . " ) AS undeleted_count, 		
-                        (SELECT COUNT(a2.id)  
-                        FROM info_users_communications  a2
-                        inner join info_users_detail b2 on b2.root_id = a2.user_id AND b2.deleted =0 and b2.active =0 
-                        INNER JOIN sys_specific_definitions sdy ON sdy.main_group = 15 AND sdy.first_group= a2.deleted AND sdy.language_code = a2.language_code AND sdy.deleted = 0 AND sdy.active = 0
-                        INNER JOIN sys_specific_definitions sd1y ON sd1y.main_group = 16 AND sd1y.first_group= a2.active AND sd1y.language_code = a2.language_code AND sd1y.deleted = 0 AND sd1y.active = 0                
-                        INNER JOIN sys_specific_definitions sd6y ON sd6y.main_group = 5 AND sd6y.first_group= a2.communications_type_id AND sd6y.language_code = a2.language_code AND sd6y.deleted = 0 AND sd6y.active = 0
-                        INNER JOIN sys_language ly ON ly.language_main_code = a2.language_code AND ly.deleted =0 AND ly.active = 0 
-                        INNER JOIN info_users uy ON uy.id = a2.op_user_id 
-                         " . $whereSql2 . " )  AS deleted_count   		  
+                        COUNT(a.id) AS COUNT
                 FROM info_users_communications  a
-                inner join info_users_detail b on b.root_id = a.user_id AND b.deleted =0 and b.active =0 
-                INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_code = a.language_code AND sd.deleted = 0 AND sd.active = 0
-                INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_code = a.language_code AND sd1.deleted = 0 AND sd1.active = 0                
-                INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_code = a.language_code AND sd6.deleted = 0 AND sd6.active = 0
-                INNER JOIN sys_language l ON l.language_main_code = a.language_code AND l.deleted =0 AND l.active = 0 
-                INNER JOIN info_users u ON u.id = a.op_user_id 
-                " . $whereSql . "
+                INNER JOIN info_users_detail b ON b.root_id = a.user_id AND b.active = 0 AND b.deleted = 0  
+                INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_id = a.language_id AND sd.deleted = 0 AND sd.active = 0
+                INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_id = a.language_id AND sd1.deleted = 0 AND sd1.active = 0                
+                INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_id = a.language_id AND sd6.deleted = 0 AND sd6.active = 0
+                INNER JOIN sys_language l ON l.id = a.language_id AND l.deleted =0 AND l.active = 0 
+		INNER JOIN info_users u ON u.id = a.op_user_id 
+		INNER JOIN sys_specific_definitions AS sd7 ON sd7.main_group =14 AND sd7.first_group = a.consultant_confirm_type_id AND sd7.deleted = 0 AND sd7.active = 0 AND sd7.language_id = a.language_id 
+		INNER JOIN sys_operation_types op ON op.id = b.operation_type_id AND op.deleted = 0 AND op.active = 0 AND op.language_id = a.language_id 
+                WHERE a.language_id = " . intval($languageIdValue)." 
+                    AND b.user_id = " . intval($opUserIdValue) ." 
                     ";
                 $statement = $pdo->prepare($sql);
                 $statement->execute();
@@ -702,7 +767,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
             } else {
                 $errorInfo = '23502';   // 23502  user_id not_null_violation
                 $errorInfoColumn = 'pk';                
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             //$debugSQLParams = $statement->debugDumpParams();
@@ -710,8 +775,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * user interface datagrid fill operation get row count for widget
+    /**     
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_users_communications tablosundan çekilen kayıtlarının kaç tane olduğunu döndürür   !!
      * @version v 1.0  01.02.2016
@@ -785,15 +849,23 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     public function fillUserCommunicationsTypes($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $userId = InfoUsers::getUserId(array('pk' => $params['pk']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
+            $opUserIdParams = array('pk' =>  $params['pk'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserId($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }                       
+                
                 $statement = $pdo->prepare("
                 SELECT                
                     a.id ,	
@@ -806,8 +878,8 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                     a.user_id = :user_id                    
                 ORDER BY name                
                                  ");
-                $statement->bindValue(':language_id', $params['language_id'], \PDO::PARAM_INT);
-                $statement->bindValue(':user_id', $userIdValue, \PDO::PARAM_STR);
+                $statement->bindValue(':language_id', $languageIdValue, \PDO::PARAM_INT);
+                $statement->bindValue(':user_id', $opUserIdValue, \PDO::PARAM_STR);
                 $statement->execute();
                 $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
                 $errorInfo = $statement->errorInfo();
@@ -818,7 +890,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                 $errorInfo = '23505';   // 23505  unique_violation
                 $errorInfoColumn = 'pk';            
                 $result = $kontrol;
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {      
             return array("found" => false, "errorInfo" => $e->getMessage());
@@ -887,8 +959,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * 
+    /** 
      * @author Okan CIRAN     
      * insertLanguageTemplate fonksiyonu ile oluşturulmuş kayıtları 
      * combobox dan çağırmak için hazırlandı.
@@ -964,94 +1035,141 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-            $userId = InfoUsers::getUserId(array('pk' => $params['pk']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-
-                $addSql = "";
-                $addSqlValue = "";
-                if (isset($params['act_parent_id'])) {
-                    $act_parent_id = intval($params['act_parent_id']);
-                    $addSql .= " act_parent_id, ";
-                    if ($act_parent_id == 0) {
-                        $act_parent_id = intval($params['id']);
+            $opUserIdParams = array('pk' =>  $params['pk'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserId($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];
+                $opUserRoleIdValue = $opUserId ['resultSet'][0]['role_id'];
+                   
+                $kontrol = $this->haveRecords(array(
+                                        'user_id' => $opUserIdValue, 
+                                        'communications_no' => $params['communications_no'], 
+                                        'communications_type_id' => $params['communications_type_id'], 
+                                            ));
+                if (!\Utill\Dal\Helper::haveRecord($kontrol)) {
+                
+                
+                
+                $url = null;
+                if (isset($params['url']) && $params['url'] != "") {
+                    $url = $params['url'];
+                }    
+                $m = null;
+                if (isset($params['m']) && $params['m'] != "") {
+                    $m = $params['m'];
+                }  
+                $a = null;
+                if (isset($params['a']) && $params['a'] != "") {
+                    $a = $params['a'];
+                }  
+                $operationIdValue =  0;
+                $assignDefinitionIdValue = 0;
+                $operationTypeParams = array('url' => $url, 'role_id' => $opUserRoleIdValue, 'm' => $m,'a' => $a,);
+                $operationTypes = $this->slimApp-> getBLLManager()->get('operationsTypesBLL');  
+                $operationTypesValue = $operationTypes->getDeleteOperationId($operationTypeParams);
+                if (\Utill\Dal\Helper::haveRecord($operationTypesValue)) { 
+                    $operationIdValue = $operationTypesValue ['resultSet'][0]['id']; 
+                    $assignDefinitionIdValue = $operationTypesValue ['resultSet'][0]['assign_definition_id'];
+                    if ($operationIdValue > 0) {
+                        $url = null;
                     }
-                    $addSqlValue .= intval($act_parent_id) . ", ";
-                }
-
-                if (isset($params['operation_type_id'])) {
-                    $addSql .= " operation_type_id, ";
-                    $addSqlValue .= intval($params['operation_type_id']) . ", ";
-                }
+                }  
 
                 $this->makePassive(array('id' => $params['id']));
 
                 $statementInsert = $pdo->prepare(" 
                     INSERT INTO info_users_communications (
-                        user_id,                        
+                        user_id,
                         active, 
                         deleted,
-                        op_user_id, 
-                        " . $addSql . "
-                        language_code,                         
+                        op_user_id,
+                        operation_type_id,
                         communications_type_id, 
                         communications_no, 
                         description, 
                         description_eng,
-                        
-                        profile_public, 
-                        f_check, 
+                        profile_public,
                         consultant_id,
                         consultant_confirm_type_id, 
-                        confirm_id,                        
-                        language_parent_id ,
-                        history_parent_id,
+                        confirm_id,
+                        language_parent_id,                        
                         consultant_id,
                         consultant_confirm_type_id,
                         confirm_id,
                         act_parent_id,
-                        default_communication_id                     
-                        )    
-                        
+                        default_communication_id 
+                        )
                     SELECT
                         user_id,
                         1 AS active,  
                         1 AS deleted, 
-                        " . intval($userIdValue) . " AS op_user_id,  
-                        " . $addSqlValue . " 
-                        language_code,
+                        " . intval($opUserIdValue) . " AS op_user_id,
+                        " . intval($operationIdValue) . ",
                         communications_type_id,
                         communications_no,
                         description,
                         description_eng,
-                        profile_public, 
-                        f_check,                
+                        profile_public,
                         consultant_id, 
                         consultant_confirm_type_id, 
-                        confirm_id,                        
-                        language_parent_id ,
-                        history_parent_id,
+                        confirm_id,
+                        language_parent_id ,                        
                         consultant_id,
                         consultant_confirm_type_id,
                         confirm_id,
                         act_parent_id,
-                        default_communication_id                     
+                        default_communication_id 
                     FROM info_users_communications 
                     WHERE id  =" . intval($params['id']) . "    
                     )");
 
                 $insertAct = $statementInsert->execute();
                 $affectedRows = $statementInsert->rowCount();
+                $insertID = $pdo->lastInsertId('info_users_communications_id_seq');
                 $errorInfo = $statementInsert->errorInfo();
-                if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                    throw new \PDOException($errorInfo[0]);
+                /*
+                 * ufak bir trik var. 
+                 * işlem update oldugunda update işlemini yapan kişinin dil bilgisini kullanıcaz. 
+                 * ancak delete işlemi oldugunda delete işlemini yapan user in dil bilgisini değil 
+                 * silinen kaydı yapan kişinin dil bilgisini alıcaz.
+                 */
+                $consIdAndLanguageId = SysOperationTypes::getConsIdAndLanguageId(
+                                   array('operation_type_id' =>$operationIdValue, 'id' => $params['id'],));
+                if (\Utill\Dal\Helper::haveRecord($consIdAndLanguageId)) {
+                    $ConsultantId = $consIdAndLanguageId ['resultSet'][0]['consultant_id'];
+                    $languageIdValue = $consIdAndLanguageId ['resultSet'][0]['language_id'];
+                    $assignDefinitionIdValue = $consIdAndLanguageId ['resultSet'][0]['assign_definition_id'];
+                }
+ 
+                $consultantProcessSendParams = array(
+                            'op_user_id' => intval($opUserIdValue), // işlemi yapan user
+                            'operation_type_id' => intval($operationIdValue), // operasyon 
+                            'table_column_id' => intval($insertID), // işlem yapılan tablo id si
+                            'cons_id' => intval($ConsultantId), // atanmış olan danısman 
+                            'preferred_language_id' => intval($languageIdValue), // dil bilgisi
+                            'url' => $url,
+                            'assign_definition_id' => $assignDefinitionIdValue, // operasyon atama tipi
+                         );
+                $setConsultantProcessSend = $this->slimApp-> getBLLManager()->get('consultantProcessSendBLL');  
+                $setConsultantProcessSendArray= $setConsultantProcessSend->insert($consultantProcessSendParams);
+                if ($setConsultantProcessSendArray['errorInfo'][0] != "00000" &&
+                        $setConsultantProcessSendArray['errorInfo'][1] != NULL &&
+                        $setConsultantProcessSendArray['errorInfo'][2] != NULL)
+                    throw new \PDOException($setConsultantProcessSendArray['errorInfo']);
                 $pdo->commit();
                 return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $affectedRows);
+                } else {
+                    $errorInfo = '23505';
+                    $errorInfoColumn = 'communications_no';
+                    $pdo->rollback();
+                    return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                }                
             } else {
                 $errorInfo = '23502';  /// 23502  not_null_violation
-                $errorInfoColumn = 'pk / op_user_id';
+                $errorInfoColumn = 'pk';
                  $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -1070,55 +1188,76 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-
-            $opUserId = InfoUsers::getUserIdTemp(array('pktemp' => $params['pktemp']));
+            $opUserIdParams = array('pktemp' =>  $params['pktemp'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserIdTemp($opUserIdParams);
             if (\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];
-                $addSql = " op_user_id, ";
-                $addSqlValue = " " . $opUserIdValue . ",";
-                $addSql .= " user_id,  ";
-                $userId = $opUserIdValue;
-                $addSqlValue .= " " . $userId . ",";
-
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-                $addSql .= " language_id,  ";
-                $addSqlValue .= " " . intval($languageIdValue) . ",";
-               
-
-                $addSql .= " operation_type_id,  ";
-                if ((isset($params['operation_type_id']) && $params['operation_type_id'] != "")) {
-                    $addSqlValue .= " " . intval($params['operation_type_id']) . ",";
-                } ELSE {
-                    $addSqlValue .= " 1,";
-                }
-
-                $getConsultant = SysOsbConsultants::getConsultantIdForUsers(array('category_id' => 1));
-                if (\Utill\Dal\Helper::haveRecord($getConsultant['resultSet'][0]['consultant_id'])) {
-                    $ConsultantId = $getConsultant ['resultSet'][0]['consultant_id'];
-                } else {
-                    $ConsultantId = 1001;
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id']; 
+                $opUserRoleIdValue = $opUserId ['resultSet'][0]['role_id'];                            
+                $url = null;
+                if (isset($params['url']) && $params['url'] != "") {
+                    $url = $params['url'];
+                }    
+                $m = null;
+                if (isset($params['m']) && $params['m'] != "") {
+                    $m = $params['m'];
+                }  
+                $a = null;
+                if (isset($params['a']) && $params['a'] != "") {
+                    $a = $params['a'];
+                }  
+                $operationIdValue =  0;
+                $assignDefinitionIdValue = 0;
+                $operationTypeParams = array('url' => $url, 'role_id' => $opUserRoleIdValue, 'm' => $m,'a' => $a,);                        
+                $operationTypes = $this->slimApp-> getBLLManager()->get('operationsTypesBLL');  
+                $operationTypesValue = $operationTypes->getInsertOperationId($operationTypeParams);
+                if (\Utill\Dal\Helper::haveRecord($operationTypesValue)) { 
+                    $operationIdValue = $operationTypesValue ['resultSet'][0]['id']; 
+                    $assignDefinitionIdValue = $operationTypesValue ['resultSet'][0]['assign_definition_id'];                    
+                }  
+                $userId = $opUserIdValue;   
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }  
+                
+                $ConsultantId = 1001;
+                if ($operationIdValue > 0) {
+                    $url = null;
+                    $getConsultantParams = array('operation_type_id' => $operationIdValue, 'language_id' => $languageIdValue,);
+                    $getConsultant = $this->slimApp->getBLLManager()->get('beAssignedConsultantBLL');
+                    $getConsultantArray = $getConsultant->getBeAssignedConsultant($getConsultantParams);
+                    if (\Utill\Dal\Helper::haveRecord($getConsultantArray)) {
+                        $ConsultantId = $getConsultantArray ['resultSet'][0]['consultant_id'];
+                    }
                 }
                 $sql = " 
-                        INSERT INTO info_users_communications (                           
-                                " . $addSql . "                              
-                                language_code,                         
+                        INSERT INTO info_users_communications (
+                                op_user_id,
+                                user_id,  
+                                language_id,
+                                operation_type_id, 
                                 communications_type_id, 
                                 communications_no, 
                                 description, 
                                 description_eng,
-                                profile_public,
-                                history_parent_id,
+                                profile_public,   
+                                act_parent_id,
                                 default_communication_id ,
                                 consultant_id
                                 )                        
-                        VALUES (
-                                " . $addSqlValue . "                                                                       
-                                :language_code,                         
+                        VALUES (                                
+                                " . intval($opUserIdValue) . ",
+                                " . intval($userId) . ",
+                                " . intval($languageIdValue) . ",
+                                " . intval($operationIdValue) . ",
                                 :communications_type_id, 
                                 :communications_no, 
                                 :description, 
@@ -1126,32 +1265,46 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                                 :profile_public,
                                 (SELECT last_value FROM info_users_communications_id_seq),
                                 :default_communication_id,
-                                :consultant_id
-                    
+                                :consultant_id                    
                                               )  ";
-                $statement = $pdo->prepare($sql);
-                $statement->bindValue(':language_code', $params['language_code'], \PDO::PARAM_STR);
+                $statement = $pdo->prepare($sql);                
                 $statement->bindValue(':communications_type_id', $params['communications_type_id'], \PDO::PARAM_INT);
                 $statement->bindValue(':communications_no', $params['communications_no'], \PDO::PARAM_STR);
                 $statement->bindValue(':description', $params['description'], \PDO::PARAM_STR);
                 $statement->bindValue(':description_eng', $params['description_eng'], \PDO::PARAM_STR);
                 $statement->bindValue(':profile_public', $params['profile_public'], \PDO::PARAM_INT);
                 $statement->bindValue(':default_communication_id', $params['default_communication_id'], \PDO::PARAM_INT);
-                $statement->bindValue(':consultant_id', $params['consultant_id'], \PDO::PARAM_INT);
+                $statement->bindValue(':consultant_id',$ConsultantId, \PDO::PARAM_INT);
                 // echo debugPDO($sql, $params);                
                 $result = $statement->execute();
                 $insertID = $pdo->lastInsertId('info_users_communications_id_seq');
                 $errorInfo = $statement->errorInfo();
                 if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
-                    throw new \PDOException($errorInfo[0]);
+                    throw new \PDOException($errorInfo[0]);                
+                
+                $consultantProcessSendParams = array(
+                            'op_user_id' => intval($opUserIdValue), // işlemi yapan user
+                            'operation_type_id' => intval($operationIdValue), // operasyon 
+                            'table_column_id' => intval($insertID), // işlem yapılan tablo id si
+                            'cons_id' => intval($ConsultantId), // atanmış olan danısman 
+                            'preferred_language_id' => intval($languageIdValue), // dil bilgisi
+                            'url' => $url,
+                            'assign_definition_id' => $assignDefinitionIdValue, // operasyon atama tipi
+                         );
+                $setConsultantProcessSend = $this->slimApp-> getBLLManager()->get('consultantProcessSendBLL');  
+                $setConsultantProcessSendArray= $setConsultantProcessSend->insert($consultantProcessSendParams);
+                if ($setConsultantProcessSendArray['errorInfo'][0] != "00000" &&
+                        $setConsultantProcessSendArray['errorInfo'][1] != NULL &&
+                        $setConsultantProcessSendArray['errorInfo'][2] != NULL)
+                    throw new \PDOException($setConsultantProcessSendArray['errorInfo']);
+                
                 $pdo->commit();
-
                 return array("found" => true, "errorInfo" => $errorInfo, "lastInsertId" => $insertID);
             } else {
                 $errorInfo = '23502';   // 23502  not_null_violation
-                $errorInfoColumn = 'pk';
+                $errorInfoColumn = 'pktemp';
                  $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -1171,77 +1324,148 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-            $opUserId = InfoUsers::getUserIdTemp(array('pktemp' => $params['pktemp']));
+            $opUserIdParams = array('pktemp' =>  $params['pktemp'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserIdTemp($opUserIdParams);
             if (\Utill\Dal\Helper::haveRecord($opUserId)) {
-                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id']; 
+                $opUserRoleIdValue = $opUserId ['resultSet'][0]['role_id'];                 
+                $url = null;
+                if (isset($params['url']) && $params['url'] != "") {
+                    $url = $params['url'];
+                }    
+                $m = null;
+                if (isset($params['m']) && $params['m'] != "") {
+                    $m = $params['m'];
+                }  
+                $a = null;
+                if (isset($params['a']) && $params['a'] != "") {
+                    $a = $params['a'];
+                }  
+                $operationIdValue =  0;
+                $assignDefinitionIdValue = 0;
+                $operationTypeParams = array('url' => $url, 'role_id' => $opUserRoleIdValue, 'm' => $m,'a' => $a,);
+                $operationTypes = $this->slimApp-> getBLLManager()->get('operationsTypesBLL');  
+                $operationTypesValue = $operationTypes->getUpdateOperationId($operationTypeParams);
+                if (\Utill\Dal\Helper::haveRecord($operationTypesValue)) { 
+                    $operationIdValue = $operationTypesValue ['resultSet'][0]['id']; 
+                    $assignDefinitionIdValue = $operationTypesValue ['resultSet'][0]['assign_definition_id'];
+                    if ($operationIdValue > 0) {
+                        $url = null;
+                    }
+                }      
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }  
+                $defaultCommunicationId = 0 ; 
+                if ((isset($params['default_communication_id']) && $params['default_communication_id'] != "")) {                
+                    $defaultCommunicationId =  $params['default_communication_id'] ;
+                }  
+                
+                $communicationsTypeId = 0 ; 
+                if ((isset($params['communications_type_id']) && $params['communications_type_id'] != "")) {                
+                    $communicationsTypeId =  $params['communications_type_id'] ;
+                }  
+                $active = 0 ; 
+                if ((isset($params['active']) && $params['active'] != "")) {                
+                    $active =  $params['active'] ;
+                }  
+                $profilePublic = 0 ; 
+                if ((isset($params['profile_public']) && $params['profile_public'] != "")) {                
+                    $profilePublic =  $params['profile_public'] ;
+                }     
+                          
                 $this->makePassive(array('id' => $params['id']));
-
                 $statementInsert = $pdo->prepare("
                 INSERT INTO info_users_communications (
                         user_id,                        
                         active, 
                         op_user_id, 
-                        operation_type_id, 
-                        language_code,    
+                        operation_type_id,                         
                         language_id,  
                         communications_type_id, 
                         communications_no, 
                         description, 
                         description_eng,                        
-                        profile_public, 
-                        f_check, 
+                        profile_public,                         
                         consultant_id,
                         consultant_confirm_type_id, 
                         confirm_id, 
                         act_parent_id, 
-                        language_parent_id,
-                        history_parent_id,
+                        language_parent_id,                        
                         default_communication_id                        
                         )  
                 SELECT
                     user_id,
-                    " . intval($params['active']) . " AS active,   
+                    " . intval($active) . " AS active,   
                     " . intval($opUserIdValue) . " AS op_user_id,  
-                    " . intval($params['operation_type_id']) . " AS operation_type_id,
-                    '" . $params['language_code'] . "' AS language_code,
+                    " . intval($operationIdValue) . " AS operation_type_id,                    
                     " . intval($languageIdValue) . " AS language_id,    
-                    " . intval($params['communications_type_id']) . " AS communications_type_id,
+                    " . intval($communicationsTypeId) . " AS communications_type_id,
                     '" . $params['communications_no'] . "' AS communications_no,
                     '" . $params['description'] . "' AS description,
                     '" . $params['description_eng'] . "' AS description_eng,
-                    profile_public, 
-                    f_check,                
+                     " . intval($profilePublic) . " AS profile_public,                                
                     consultant_id, 
                     consultant_confirm_type_id, 
                     confirm_id, 
                     act_parent_id, 
-                    language_parent_id,
-                    history_parent_id,
-                    " . intval($params['default_communication_id']) . " AS default_communication_id                     
+                    language_parent_id,                    
+                    " . intval($defaultCommunicationId) . " AS default_communication_id                     
                 FROM info_users_communications 
-                WHERE id  =" . intval($params['id']) . " 
-                    
+                WHERE id  =" . intval($params['id']) . "                     
                                                 ");
-
                 $result = $statementInsert->execute();
                 $insertID = $pdo->lastInsertId('info_users_communications_id_seq');
-                $errorInfo = $statement->errorInfo();
+                $affectedRows = $statementInsert->rowCount();
+                $errorInfo = $statementInsert->errorInfo();
                 if ($errorInfo[0] != "00000" && $errorInfo[1] != NULL && $errorInfo[2] != NULL)
                     throw new \PDOException($errorInfo[0]);
-
+                
+                  /*
+                * ufak bir trik var. 
+                * işlem update oldugunda update işlemini yapan kişinin dil bilgisini kullanıcaz. 
+                * ancak delete işlemi oldugunda delete işlemini yapan user in dil bilgisini değil 
+                * silinen kaydı yapan kişinin dil bilgisini alıcaz.
+                */
+                $consIdAndLanguageId = SysOperationTypes::getConsIdAndLanguageId(
+                               array('operation_type_id' =>$operationIdValue, 'id' => $params['id'],));
+                if (\Utill\Dal\Helper::haveRecord($consIdAndLanguageId)) {
+                    $ConsultantId = $consIdAndLanguageId ['resultSet'][0]['consultant_id'];                    
+                    // $languageIdValue = $consIdAndLanguageId ['resultSet'][0]['language_id'];                       
+                }
+ 
+                $consultantProcessSendParams = array(
+                            'op_user_id' => intval($opUserIdValue), // işlemi yapan user
+                            'operation_type_id' => intval($operationIdValue), // operasyon 
+                            'table_column_id' => intval($insertID), // işlem yapılan tablo id si
+                            'cons_id' => intval($ConsultantId), // atanmış olan danısman 
+                            'preferred_language_id' => intval($languageIdValue), // dil bilgisi
+                            'url' => $url,
+                            'assign_definition_id' => $assignDefinitionIdValue, // operasyon atama tipi
+                         );
+                $setConsultantProcessSend = $this->slimApp-> getBLLManager()->get('consultantProcessSendBLL');  
+                $setConsultantProcessSendArray= $setConsultantProcessSend->insert($consultantProcessSendParams);
+                if ($setConsultantProcessSendArray['errorInfo'][0] != "00000" &&
+                        $setConsultantProcessSendArray['errorInfo'][1] != NULL &&
+                        $setConsultantProcessSendArray['errorInfo'][2] != NULL)
+                    throw new \PDOException($setConsultantProcessSendArray['errorInfo']);
+  
                 $pdo->commit();
                 return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $affectedRows);
             } else {
                 $errorInfo = '23502';   // 23502  user_id not_null_violation
-                $errorInfoColumn = 'user_id';
+                $errorInfoColumn = 'pktemp';
                 $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();
@@ -1249,9 +1473,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * Datagrid fill function used for testing
-     * user interface datagrid fill operation   
+    /**     
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_users_communications tablosundan kayıtları döndürür !!
      * @version v 1.0  01.02.2016
@@ -1262,40 +1484,44 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     public function fillGridSingularTemp($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $userId = InfoUsers::getUserIdTemp(array('pktemp' => $params['pktemp']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                $whereSql = " AND b.root_id = " . $userId ['resultSet'][0]['user_id'];
-
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-                $whereSql .= " AND a.language_id = " . intval($languageIdValue)  ;
-                
+            $opUserIdParams = array('pktemp' =>  $params['pktemp'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserIdTemp($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }  
                 $sql = "
                 SELECT 
-                    a.id,                                          
-                    a.communications_type_id, 
-                    sd6.description AS comminication_type,   
-                    a.communications_no,                    
-                    a.default_communication_id ,
+                    a.id,
+                    a.active,
+                    a.profile_public,
+                    a.communications_type_id,
+                    COALESCE(NULLIF(sd5x.description , ''), sd5.description_eng) AS comminication_type,
+                    a.communications_no,
+                    a.default_communication_id,
                     CASE a.default_communication_id 
                         WHEN 1 THEN 'Default' 
                     END AS default_communication
-                FROM info_users_communications  a
-                inner join info_users_detail b on b.root_id = a.user_id and b.active = 0 and b.deleted = 0  
-                INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_id = a.language_id AND sd.deleted = 0 AND sd.active = 0
-                INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_id = a.language_id AND sd1.deleted = 0 AND sd1.active = 0                
-                INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_id = a.language_id AND sd6.deleted = 0 AND sd6.active = 0
+                FROM info_users_communications a
                 INNER JOIN sys_language l ON l.id = a.language_id AND l.deleted =0 AND l.active = 0 
-		INNER JOIN info_users u ON u.id = a.op_user_id 
-		INNER JOIN sys_specific_definitions as sd7 on sd7.main_group =14 AND sd7.first_group = a.consultant_confirm_type_id AND sd7.deleted = 0 AND sd7.active = 0 AND sd7.language_id = a.language_id 
-		INNER JOIN sys_operation_types op on op.id = b.operation_type_id AND op.deleted = 0 AND op.active = 0 AND op.language_id = a.language_id 
-                WHERE a.deleted =0 AND a.active =0  
-                " . $whereSql . "
-                ORDER BY sd6.first_group 
+                LEFT JOIN sys_language lx ON lx.id = ".intval($languageIdValue)." AND lx.deleted =0 AND lx.active =0
+                INNER JOIN sys_specific_definitions sd5 ON sd5.main_group = 5 AND sd5.first_group= a.communications_type_id AND sd5.language_id = a.language_id AND sd5.deleted = 0 AND sd5.active = 0
+		LEFT JOIN sys_specific_definitions sd5x ON (sd5x.id = sd5.id OR sd5x.language_parent_id = sd5.id) AND sd5x.language_id = lx.id  AND sd5x.deleted = 0 AND sd5x.active = 0
+                WHERE 
+                    a.deleted =0 AND 
+                    a.active =0 AND 
+                    a.language_parent_id = 0 
+                    a.user_id = " . intval($opUserId ['resultSet'][0]['user_id'])."                     
+                ORDER BY sd5.first_group 
                 ";
                 $statement = $pdo->prepare($sql);
                 // echo debugPDO($sql, $args);         
@@ -1307,8 +1533,8 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                 return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => $result);
             } else {
                 $errorInfo = '23502';   // 23502  user_id not_null_violation
-                $errorInfoColumn = 'user_id';              
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                $errorInfoColumn = 'pktemp';              
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             //$debugSQLParams = $statement->debugDumpParams();
@@ -1316,8 +1542,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         }
     }
 
-    /**
-     * user interface datagrid fill operation get row count for widget
+    /**     
      * @author Okan CIRAN
      * @ Gridi doldurmak için info_users_communications tablosundan çekilen kayıtlarının kaç tane olduğunu döndürür   !!
      * @version v 1.0  01.02.2016
@@ -1328,54 +1553,20 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     public function fillGridSingularRowTotalCountTemp($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $userId = InfoUsers::getUserIdTemp(array('pktemp' => $params['pktemp']));
-            if (\Utill\Dal\Helper::haveRecord($userId)) {
-                
-                $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-       
-                $whereSql = " WHERE a.language_id = " . intval($languageIdValue) ;
-                $whereSql1 = " WHERE a1.deleted =0 AND a1.language_id = " . intval($languageIdValue) ;
-                $whereSql2 = " WHERE a2.deleted =1 AND a2.language_id = " . intval($languageIdValue) ;
-
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-                $whereSql .= " AND b.root_id = " . $userIdValue;
-                $whereSql1 .= " AND b1.root_id = " . $userIdValue;
-                $whereSql2 .= " AND b2.root_id = " . $userIdValue;
-
+            $opUserIdParams = array('pktemp' =>  $params['pktemp'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserIdTemp($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {     
                 $sql = "
                 SELECT 
-                        COUNT(a.id) AS COUNT ,  
-                        (SELECT COUNT(a1.id)  
-                        FROM info_users_communications  a1
-                        inner join info_users_detail b1 on b1.root_id = a1.user_id AND b1.deleted =0 and b1.active =0 
-                        INNER JOIN sys_specific_definitions sdx ON sdx.main_group = 15 AND sdx.first_group= a1.deleted AND sdx.language_id = a1.language_id AND sdx.deleted = 0 AND sdx.active = 0
-                        INNER JOIN sys_specific_definitions sd1x ON sd1x.main_group = 16 AND sd1x.first_group= a1.active AND sd1x.language_id = a1.language_id AND sd1x.deleted = 0 AND sd1x.active = 0                
-                        INNER JOIN sys_specific_definitions sd6x ON sd6x.main_group = 5 AND sd6x.first_group= a1.communications_type_id AND sd6x.language_id = a1.language_id AND sd6x.deleted = 0 AND sd6x.active = 0
-                        INNER JOIN sys_language lx ON lx.id = a1.language_id AND lx.deleted =0 AND lx.active = 0 
-                        INNER JOIN info_users ux ON ux.id = a1.op_user_id 
-                          " . $whereSql1 . " ) AS undeleted_count, 		
-                        (SELECT COUNT(a2.id)  
-                        FROM info_users_communications  a2
-                        inner join info_users_detail b2 on b2.root_id = a2.user_id AND b2.deleted =0 and b2.active =0 
-                        INNER JOIN sys_specific_definitions sdy ON sdy.main_group = 15 AND sdy.first_group= a2.deleted AND sdy.language_id = a2.language_id AND sdy.deleted = 0 AND sdy.active = 0
-                        INNER JOIN sys_specific_definitions sd1y ON sd1y.main_group = 16 AND sd1y.first_group= a2.active AND sd1y.language_id = a2.language_id AND sd1y.deleted = 0 AND sd1y.active = 0                
-                        INNER JOIN sys_specific_definitions sd6y ON sd6y.main_group = 5 AND sd6y.first_group= a2.communications_type_id AND sd6y.language_id = a2.language_id AND sd6y.deleted = 0 AND sd6y.active = 0
-                        INNER JOIN sys_language ly ON ly.id = a2.language_id AND ly.deleted =0 AND ly.active = 0 
-                        INNER JOIN info_users uy ON uy.id = a2.op_user_id 
-                         " . $whereSql2 . " )  AS deleted_count   		  
-                FROM info_users_communications  a
-                inner join info_users_detail b on b.root_id = a.user_id AND b.deleted =0 and b.active =0 
-                INNER JOIN sys_specific_definitions sd ON sd.main_group = 15 AND sd.first_group= a.deleted AND sd.language_id = a.language_id AND sd.deleted = 0 AND sd.active = 0
-                INNER JOIN sys_specific_definitions sd1 ON sd1.main_group = 16 AND sd1.first_group= a.active AND sd1.language_id = a.language_id AND sd1.deleted = 0 AND sd1.active = 0                
-                INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_id = a.language_id AND sd6.deleted = 0 AND sd6.active = 0
-                INNER JOIN sys_language l ON l.id = a.language_id AND l.deleted =0 AND l.active = 0 
-                INNER JOIN info_users u ON u.id = a.op_user_id 
-                " . $whereSql . "
+                    COUNT(a.id) AS COUNT
+                FROM info_users_communications a
+                INNER JOIN sys_language l ON l.id = a.language_id AND l.deleted =0 AND l.active = 0
+                WHERE 
+                    a.deleted =0 AND 
+                    a.active =0 AND 
+                    a.language_parent_id = 0 
+                    a.user_id = " . intval($opUserId ['resultSet'][0]['user_id'])."                     
                     ";
                 $statement = $pdo->prepare($sql);
                 // echo debugPDO($sql, $params);
@@ -1388,7 +1579,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
             } else {
                 $errorInfo = '23502';   // 23502  user_id not_null_violation
                 $errorInfoColumn = 'pk';             
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             //$debugSQLParams = $statement->debugDumpParams();
@@ -1407,31 +1598,37 @@ class InfoUsersCommunications extends \DAL\DalSlim {
     public function fillUserCommunicationsTypesTemp($params = array()) {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
-            $userId = InfoUsers::getUserIdTemp(array('pktemp' => $params['pktemp']));
-            if (!\Utill\Dal\Helper::haveRecord($userId)) {
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-                
-                 $languageId = SysLanguage::getLanguageId(array('language_code' => $params['language_code']));
-                if (\Utill\Dal\Helper::haveRecord($languageId)) {
-                    $languageIdValue = $languageId ['resultSet'][0]['id'];
-                } else {
-                    $languageIdValue = 647;
-                }
-                
+            $opUserIdParams = array('pktemp' =>  $params['pktemp'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserIdTemp($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id'];                
+                $languageCode = 'tr';
+                $languageIdValue = 647;
+                if (isset($params['language_code']) && $params['language_code'] != "") {
+                    $languageCode = $params['language_code'];
+                }       
+                $languageCodeParams = array('language_code' => $languageCode,);
+                $languageId = $this->slimApp-> getBLLManager()->get('languageIdBLL');  
+                $languageIdsArray= $languageId->getLanguageId($languageCodeParams);
+                if (\Utill\Dal\Helper::haveRecord($languageIdsArray)) { 
+                     $languageIdValue = $languageIdsArray ['resultSet'][0]['id']; 
+                }                   
                 $statement = $pdo->prepare("
                 SELECT                
                     a.id ,	
                     sd6.description AS name                                 
                 FROM info_users_communications a       
-                INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_code = a.language_code AND sd6.deleted = 0 AND sd6.active = 0                     
+                INNER JOIN sys_specific_definitions sd6 ON sd6.main_group = 5 AND sd6.first_group= a.communications_type_id AND sd6.language_id = a.language_id AND sd6.deleted = 0 AND sd6.active = 0                     
                 WHERE 
-                    a.active =0 AND a.deleted = 0 AND 
+                    a.active =0 AND 
+                    a.deleted = 0 AND 
                     a.language_id = :language_id AND 
                     a.user_id = :user_id                    
                 ORDER BY name                
                                  ");
                 $statement->bindValue(':language_id', $languageIdValue, \PDO::PARAM_INT);
-                $statement->bindValue(':user_id', $userIdValue, \PDO::PARAM_INT);
+                $statement->bindValue(':user_id', $opUserIdValue, \PDO::PARAM_INT);
                 $statement->execute();
                 $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
                 $errorInfo = $statement->errorInfo();
@@ -1442,7 +1639,7 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                 $errorInfo = '23505';   // 23505  unique_violation
                 $errorInfoColumn = 'pk';              
                 //$result = $kontrol;
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {       
             return array("found" => false, "errorInfo" => $e->getMessage());
@@ -1462,73 +1659,74 @@ class InfoUsersCommunications extends \DAL\DalSlim {
         try {
             $pdo = $this->slimApp->getServiceManager()->get('pgConnectFactory');
             $pdo->beginTransaction();
-            $userId = InfoUsers::getUserIdTemp(array('pktemp' => $params['pktemp']));
-            if (!\Utill\Dal\Helper::haveRecord($userId)) {
-                $userIdValue = $userId ['resultSet'][0]['user_id'];
-
-                $addSql = "";
-                $addSqlValue = "";
-                if (isset($params['act_parent_id'])) {
-                    $act_parent_id = intval($params['act_parent_id']);
-                    $addSql .= " act_parent_id, ";
-                    if ($act_parent_id == 0) {
-                        $act_parent_id = intval($params['id']);
+            $opUserIdParams = array('pktemp' =>  $params['pktemp'],);
+            $opUserIdArray = $this->slimApp-> getBLLManager()->get('opUserIdBLL');  
+            $opUserId = $opUserIdArray->getUserIdTemp($opUserIdParams);
+            if (\Utill\Dal\Helper::haveRecord($opUserId)) {
+                $opUserIdValue = $opUserId ['resultSet'][0]['user_id']; 
+                $opUserRoleIdValue = $opUserId ['resultSet'][0]['role_id'];
+                            
+                $url = null;
+                if (isset($params['url']) && $params['url'] != "") {
+                    $url = $params['url'];
+                }    
+                $m = null;
+                if (isset($params['m']) && $params['m'] != "") {
+                    $m = $params['m'];
+                }  
+                $a = null;
+                if (isset($params['a']) && $params['a'] != "") {
+                    $a = $params['a'];
+                }  
+                $operationIdValue =  0;
+                $assignDefinitionIdValue = 0;
+                $operationTypeParams = array('url' => $url, 'role_id' => $opUserRoleIdValue, 'm' => $m,'a' => $a,);
+                $operationTypes = $this->slimApp-> getBLLManager()->get('operationsTypesBLL');  
+                $operationTypesValue = $operationTypes->getDeleteOperationId($operationTypeParams);
+                if (\Utill\Dal\Helper::haveRecord($operationTypesValue)) { 
+                    $operationIdValue = $operationTypesValue ['resultSet'][0]['id']; 
+                    $assignDefinitionIdValue = $operationTypesValue ['resultSet'][0]['assign_definition_id'];
+                    if ($operationIdValue > 0) {
+                        $url = null;
                     }
-                    $addSqlValue .= intval($act_parent_id) . ", ";
-                }
-
-                $operationTypeId = 3;
-                $addSql .= " operation_type_id, ";
-                if (isset($params['operation_type_id'])) {
-                    $operationTypeId = intval($params['operation_type_id']);
-                }
-                $addSqlValue .= intval($operationTypeId) . ", ";
-
+                }  
                 $this->makePassive(array('id' => $params['id']));
-
                 $statementInsert = $pdo->prepare(" 
                     INSERT INTO info_users_communications (
                         user_id,                        
                         active, 
                         deleted,
-                        op_user_id, 
-                        " . $addSql . "
-                        language_code,                         
+                        op_user_id,
+                        operation_type_id,                         
                         communications_type_id, 
                         communications_no, 
                         description, 
                         description_eng,                        
-                        profile_public, 
-                        f_check, 
+                        profile_public,                         
                         consultant_id,
                         consultant_confirm_type_id, 
                         confirm_id,                        
-                        language_parent_id ,
-                        history_parent_id,
+                        language_parent_id ,                        
                         consultant_id,
                         consultant_confirm_type_id,
                         confirm_id,
                         default_communication_id 
-                        )    
-                        
+                        )                            
                     SELECT
                         user_id,
                         1 AS active,  
                         1 AS deleted, 
-                        " . intval($userIdValue) . " AS op_user_id,  
-                        " . $addSqlValue . " 
-                        language_code,
+                        ". intval($opUserIdValue) . " AS op_user_id,                  
+                        ". intval($operationIdValue) . ",                        
                         communications_type_id,
                         communications_no,
                         description,
                         description_eng,
-                        profile_public, 
-                        f_check,                
+                        profile_public,                         
                         consultant_id, 
                         consultant_confirm_type_id, 
                         confirm_id,                        
-                        language_parent_id ,
-                        history_parent_id,
+                        language_parent_id ,                        
                         consultant_id,
                         consultant_confirm_type_id,
                         confirm_id,
@@ -1536,7 +1734,6 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                     FROM info_users_communications 
                     WHERE id  =" . intval($params['id']) . "    
                     )");
-
                 $insertAct = $statementInsert->execute();
                 $affectedRows = $statementInsert->rowCount();
                 $errorInfo = $statementInsert->errorInfo();
@@ -1546,9 +1743,9 @@ class InfoUsersCommunications extends \DAL\DalSlim {
                 return array("found" => true, "errorInfo" => $errorInfo, "affectedRowsCount" => $affectedRows);
             } else {
                 $errorInfo = '23502';  /// 23502  not_null_violation
-                $errorInfoColumn = 'pk';
+                $errorInfoColumn = 'pktemp';
                  $pdo->rollback();
-                return array("found" => true, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
+                return array("found" => false, "errorInfo" => $errorInfo, "resultSet" => '', "errorInfoColumn" => $errorInfoColumn);
             }
         } catch (\PDOException $e /* Exception $e */) {
             $pdo->rollback();

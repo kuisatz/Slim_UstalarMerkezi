@@ -31,8 +31,10 @@ $res = $app->response();
 $res->header('Access-Control-Allow-Origin', '*');
 $res->header("Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS");
 
+$app->add(new \Slim\Middleware\MiddlewareInsertUpdateDeleteLog());
 $app->add(new \Slim\Middleware\MiddlewareHMAC());
 $app->add(new \Slim\Middleware\MiddlewareSecurity());
+$app->add(new \Slim\Middleware\MiddlewareMQManager());
 $app->add(new \Slim\Middleware\MiddlewareBLLManager());
 $app->add(new \Slim\Middleware\MiddlewareDalManager());
 $app->add(new \Slim\Middleware\MiddlewareServiceManager());
@@ -75,6 +77,7 @@ $app->get("/pkFillGrid_logConnection/", function () use ($app ) {
             "ip" => $flow["ip"],
             "params" => $flow["params"],
             "method" =>  $flow["method"],
+            "request_info" =>  $flow["request_info"],            
             "attributes" => array("notroot" => true,  
                 ),
         );
@@ -145,7 +148,10 @@ $app->get("/pkInsert_logConnection/", function () use ($app ) {
                                                 $app,
                                                 $_GET['method']));
     } 
-    
+    $vRequestInfo = NULL;
+    if (isset($_GET['request_info'])) {
+        $vRequestInfo = $_GET['request_info'] ;
+    } 
     
     
     $stripper->strip();
@@ -158,6 +164,7 @@ $app->get("/pkInsert_logConnection/", function () use ($app ) {
     if($stripper->offsetExists('method')) $vMethod = $stripper->offsetGet('method')->getFilterValue();
     
     
+    
     $resDataInsert = $BLL->insert(array(        
         'type_id' => $vTypeId,
         'log_datetime' => $vLogDatetime,
@@ -166,6 +173,7 @@ $app->get("/pkInsert_logConnection/", function () use ($app ) {
         'ip' => $vIp,
         'params' => $vParams,
         'method' =>$vMethod,
+        'request_info' => $vRequestInfo,
         'pk' => $Pk));
 
     $app->response()->header("Content-Type", "application/json"); 
@@ -199,7 +207,8 @@ $app->get("/pkGetAll_logConnection/", function () use ($app ) {
             "path" => $flow["path"],
             "ip" => $flow["ip"],
             "params" => $flow["params"],
-            "method" => $flow["method"],            
+            "method" => $flow["method"],   
+            "request_info" =>  $flow["request_info"],
             "attributes" => array("notroot" => true,  ),
         );
     }

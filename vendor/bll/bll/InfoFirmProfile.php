@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -31,6 +31,15 @@ class InfoFirmProfile extends \BLL\BLLSlim {
         $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
         return $DAL->insert($params);
     }
+      /**
+     * Data insert function
+     * @param array | null $params
+     * @return array
+     */
+    public function insertConsAct($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->insertConsAct($params);
+    }
 
     /**
      * Data update function
@@ -40,6 +49,26 @@ class InfoFirmProfile extends \BLL\BLLSlim {
     public function update($params = array()) {
         $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
         return $DAL->update($params);
+    }
+    
+    /**
+     * Data update function
+     * @param array | null $params
+     * @return array
+     */
+    public function updateConsAct($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->updateConsAct($params);
+    }
+    
+    /**
+     * Data update function
+     * @param array | null $params
+     * @return array
+     */
+    public function updateVerbal($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->updateVerbal($params);
     }
 
     /**
@@ -137,5 +166,283 @@ class InfoFirmProfile extends \BLL\BLLSlim {
         $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
         return $DAL->insertTemp($params);
     }
-
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillCompanyListsGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillCompanyListsGuest($params);
+        return $resultSet['resultSet'];
+    }
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillCompanyLists($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillCompanyListsGuest($params);
+        return $resultSet['resultSet'];
+    }
+    
+       /**
+     * Function to get datagrid row count on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillCompanyListsGuestRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillCompanyListsGuestRtc($params);
+        return $resultSet['resultSet'];
+    }
+    
+ 
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoEmployeesGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoEmployeesGuest($params);
+    }
+    
+            /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoEmployees($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoEmployeesGuest($params);
+    }
+    
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoSocialediaGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoSocialediaGuest($params);
+    }
+      /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoSocialedia($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoSocialediaGuest($params);
+    }
+    
+    
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoReferencesGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoReferencesGuest($params);
+    }
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoReferences($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoReferencesGuest($params);
+    }
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoCustomersGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoCustomersGuest($params);
+    }
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoCustomers($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoCustomersGuest($params);
+    }
+    
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoProductsGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoProductsGuest($params);
+    }
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoProducts($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoProductsGuest($params);
+    }
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoSectorsGuest($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoSectorsGuest($params);
+    }
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoSectors($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoSectorsGuest($params);
+    }
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyInfoBuildingNpk($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyInfoBuildingNpk($params);
+    }
+     /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillFirmFullVerbal($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillFirmFullVerbal($params);
+    }
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function getFirmEndOfId($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->getFirmEndOfId($params);
+    }
+     
+             /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function getFirmProfileConsultant($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->getFirmProfileConsultant($params);
+    }
+    
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillConsultantAllowFirmListDds($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillConsultantAllowFirmListDds($params);
+        return $resultSet['resultSet'];
+    }
+    
+    
+    
+      /**
+     * Data update function   
+     * @param array $params
+     * @return array
+     */ 
+    public function fillConsCompanyLists($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillConsCompanyLists($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Data update function   
+     * @param array $params
+     * @return array
+     */ 
+    public function fillConsCompanyListsRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillConsCompanyListsRtc($params);  
+        return $resultSet['resultSet'];
+    }
+     
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->makeActiveOrPassive($params);
+    }
+    
+       
+    /**
+     * Data update function   
+     * @param array $params
+     * @return array
+     */ 
+    public function fillUrgeCompanyLists($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillUrgeCompanyLists($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Data update function   
+     * @param array $params
+     * @return array
+     */ 
+    public function fillUrgeCompanyListsRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->fillUrgeCompanyListsRtc($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * get consultant confirmation process details
+     * @param array $params
+     * @return array
+     */
+    public function fillCompanyProfile($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        return $DAL->fillCompanyProfile($params);
+    } 
+    
+    /**
+     * Data update function   
+     * @param array $params
+     * @return array
+     */ 
+    public function getUserCompanyShortInformation($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('infoFirmProfilePDO');
+        $resultSet = $DAL->getUserCompanyShortInformation($params);  
+        return $resultSet['resultSet'];
+    }
 }

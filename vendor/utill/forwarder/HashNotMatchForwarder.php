@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 namespace Utill\Forwarder;
@@ -31,8 +31,8 @@ class HashNotMatchForwarder extends \Utill\Forwarder\AbstractForwarder {
         header("Location: {$newURL}");*/
         
         ob_end_clean();
-        //$ch = curl_init('http://slimRedirect.sanalfabrika.com/index.php/hashNotMatch');
-        $ch = curl_init('http://localhost/slim_Redirect_SanalFabrika/index.php/hashNotMatch');
+        //$ch = curl_init('http://slimRedirect.uretimosb.com/index.php/hashNotMatch');
+        $ch = curl_init('http://localhost/Slim_Redirect_Uretimosb/index.php/hashNotMatch');
         //curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
         //curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
         //curl_setopt($ch,CURLOPT_POSTFIELDS,$content);

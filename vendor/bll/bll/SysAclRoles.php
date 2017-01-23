@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -101,10 +101,10 @@ class SysAclRoles extends \BLL\BLLSlim {
      * @param array $params
      * @return array
      */
-    public function fillComboBoxFullRoles($params = array()) {
+    public function fillFullRolesDdList($params = array()) {
 
         $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
-        $resultSet = $DAL->fillComboBoxFullRoles($params);
+        $resultSet = $DAL->fillFullRolesDdList($params);
         return $resultSet['resultSet'];
     }
 
@@ -117,5 +117,90 @@ class SysAclRoles extends \BLL\BLLSlim {
         $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
         return $DAL->updateChild($params);
     }
-
+    
+        /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillComboBoxRoles($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->fillComboBoxRoles($params);
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillRolesTree ($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->fillRolesTree($params);  
+        return $resultSet['resultSet'];
+    }
+    
+   /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillRolesPropertiesList ($params = array()) {        
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->fillRolesPropertiesList($params);  
+        return $resultSet['resultSet'];
+    }
+    
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillRolesPropertiesListRtc($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->fillRolesPropertiesListRtc($params);  
+        return $resultSet['resultSet'];
+    }    
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        return $DAL->makeActiveOrPassive($params);
+    } 
+     
+   /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillConsultantRolesDdlist($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->FillConsultantRolesDdlist($params);
+        return $resultSet['resultSet'];
+    }
+    
+   /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillRolesDdlist($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->fillRolesDdlist($params);
+        return $resultSet['resultSet'];
+    }
+     
+   /**
+     * Function to fill text on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function fillClusterRolesDdlist($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysAclRolesPDO');
+        $resultSet = $DAL->fillClusterRolesDdlist($params);
+        return $resultSet['resultSet'];
+    }
 }

@@ -1,9 +1,9 @@
 <?php
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -23,7 +23,6 @@ class FilterChainerFactory extends \Utill\Factories\AbstractFactory {
         
     }
 
-    
     public function get($helperName, $app, $value) {
         if(method_exists($this,$helperName)) {
           return  $this->$helperName($app, $value);
@@ -71,7 +70,13 @@ class FilterChainerFactory extends \Utill\Factories\AbstractFactory {
                             \Services\Filter\FilterServiceNames::FILTER_JAVASCRIPT_FUNCTIONS,
         ));
     } 
-    
+    protected function onlyParanoidJasonLvl1($app, $value) { 
+        return new \Utill\Strip\Chain\StripChainer($app, $value, array(
+                            \Services\Filter\FilterServiceNames::FILTER_LOWER_CASE,
+                            \Services\Filter\FilterServiceNames::FILTER_SQL_RESERVEDWORDS,            
+                            \Services\Filter\FilterServiceNames::FILTER_HEXADECIMAL_ADVANCED,                            
+        ));
+    }
     
     protected function onlyState($app, $value) {
         return new \Utill\Strip\Chain\StripChainer($app, $value, array(
@@ -101,7 +106,7 @@ class FilterChainerFactory extends \Utill\Factories\AbstractFactory {
         return new \Utill\Strip\Chain\StripChainer($app, $value, array(
                     \Services\Filter\FilterServiceNames::FILTER_TRIM,
                     \Services\Filter\FilterServiceNames::FILTER_LOWER_CASE,
-                    \Services\Filter\FilterServiceNames::FILTER_ONLY_ALPHABETIC_ALLOWED,                                                                                             
+                    //\Services\Filter\FilterServiceNames::FILTER_ONLY_ALPHABETIC_ALLOWED,                                                                                          
         ));
     }
     
@@ -125,6 +130,16 @@ class FilterChainerFactory extends \Utill\Factories\AbstractFactory {
                     \Services\Filter\FilterServiceNames::FILTER_ONLY_FALSE_ALLOWED,                                                                                             
         ));
     }
+    
+     protected function onlyOrder($app, $value) {
+        return new \Utill\Strip\Chain\StripChainer($app, $value, array(
+                    \Services\Filter\FilterServiceNames::FILTER_TRIM,
+                    \Services\Filter\FilterServiceNames::FILTER_LOWER_CASE,
+                    \Services\Filter\FilterServiceNames::FILTER_ONLY_ORDER,                                                                                             
+        ));
+    }
+    
+     
 
     protected function getUtility($identifier = null,
             $params = null) {

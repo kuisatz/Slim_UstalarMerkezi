@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -68,7 +68,6 @@ class SysMachineTools extends \BLL\BLLSlim {
      * @return array
      */
     public function fillGrid($params = array()) {
-
         $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');
         $resultSet = $DAL->fillGrid($params);
         return $resultSet['resultSet'];
@@ -85,7 +84,66 @@ class SysMachineTools extends \BLL\BLLSlim {
         return $resultSet['resultSet'];
     }
 
-  
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function getMachineTools($params = array()) {      
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');     
+        $resultSet = $DAL->getMachineTools($params);
+        return $resultSet['resultSet'];
+    }
+     /**
+     * Function to get datagrid row count on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function getMachineToolsRtc($params = array()) {      
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');
+        $resultSet = $DAL->getMachineToolsRtc($params);
+        return $resultSet['resultSet'];
+    } 
 
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function getMachineToolsGrid($params = array()) {      
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');     
+        $resultSet = $DAL->getMachineToolsGrid($params);
+        return $resultSet['resultSet'];
+    }
+    /**
+     * Function to get datagrid row count on user interface layer
+     * @param array $params
+     * @return array
+     */
+    public function getMachineToolsGridRtc($params = array()) {      
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');
+        $resultSet = $DAL->getMachineToolsGridRtc($params);
+        return $resultSet['resultSet'];
+    } 
+    /**
+     * public key / private key and value update function
+     * @param array | null $params
+     * @return array
+     */
+    public function makeActiveOrPassive($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');
+        return $DAL->makeActiveOrPassive($params);
+    } 
+     /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function getMachineProperities($params = array()) {      
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolsPDO');     
+        $resultSet = $DAL->getMachineProperities($params);
+        return $resultSet['resultSet'];
+    }
+    
     
 }

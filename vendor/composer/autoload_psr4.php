@@ -6,6 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Foil\\' => array($vendorDir . '/foil/foil/src'),
+    'Aura\\Html\\_Config\\' => array($vendorDir . '/aura/html/config'),
+    'Aura\\Html\\' => array($vendorDir . '/aura/html/src'),
     'Zend\\Validator\\' => array($vendorDir . '/zendframework/zend-validator/src'),
     'Zend\\Uri\\' => array($vendorDir . '/zendframework/zend-uri/src'),
     'Zend\\Stdlib\\' => array($vendorDir . '/zendframework/zend-stdlib/src'),
@@ -13,7 +16,6 @@ return array(
     'Zend\\Log\\' => array($vendorDir . '/zendframework/zend-log/src'),
     'Zend\\Loader\\' => array($vendorDir . '/zendframework/zend-loader/src'),
     'Zend\\I18n\\' => array($vendorDir . '/zendframework/zend-i18n/src'),
-    'Zend\\Hydrator\\' => array($vendorDir . '/zendframework/zend-hydrator/src'),
     'Zend\\Http\\' => array($vendorDir . '/zendframework/zend-http/src'),
     'Zend\\Filter\\' => array($vendorDir . '/zendframework/zend-filter/src'),
     'Zend\\EventManager\\' => array($vendorDir . '/zendframework/zend-eventmanager/src'),
@@ -25,6 +27,9 @@ return array(
     'HMAC\\' => array($vendorDir . '/hmac'),
     'Encrypt\\' => array($vendorDir . '/encrypt'),
     'Utill\\Forwarder\\' => array($vendorDir . '/utill/forwarder'),
+    'Utill\\MQ\\Manager\\' => array($vendorDir . '/utill/mq/manager'),
+    'Utill\\MQ\\Factory\\' => array($vendorDir . '/utill/mq/factory'),
+    'Utill\\MQ\\MessageMQ\\' => array($vendorDir . '/utill/mq/messageMQ'),
     'Utill\\MQ\\' => array($vendorDir . '/utill/mq'),
     'Utill\\Serial\\' => array($vendorDir . '/utill/serial'),
     'Utill\\Env\\' => array($vendorDir . '/utill/env'),
@@ -63,4 +68,7 @@ return array(
     'Utill\\Factories\\ResulSetHelpers\\' => array($vendorDir . '/utill/factories/resultsethelpers'),
     'Utill\\Helpers\\' => array($vendorDir . '/utill/helpers'),
     'Utill\\Helpers\\ResulSetHelpers\\' => array($vendorDir . '/utill/helpers/resultsethelpers'),
+    'Utill\\Mail\\PhpMailer\\' => array($vendorDir . '/utill/mail/phpmailer'),
+    'Utill\\Mail\\' => array($vendorDir . '/utill/mail'),
+    'Utill\\Mail\\Template\\' => array($vendorDir . '/utill/mail/template'),
 );

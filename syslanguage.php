@@ -3,7 +3,7 @@
 require 'vendor/autoload.php';
 
 
-
+use \Services\Filter\Helper\FilterFactoryNames as stripChainers;
 
 /*$app = new \Slim\Slim(array(
     'mode' => 'development',
@@ -30,13 +30,14 @@ $res = $app->response();
 $res->header('Access-Control-Allow-Origin', '*');
 $res->header("Access-Control-Allow-Methods: PUT, GET, POST, DELETE, OPTIONS");
 
-//$app->add(new \Slim\Middleware\MiddlewareTest());
+$app->add(new \Slim\Middleware\MiddlewareInsertUpdateDeleteLog());
 $app->add(new \Slim\Middleware\MiddlewareHMAC()); 
 $app->add(new \Slim\Middleware\MiddlewareSecurity());
+$app->add(new \Slim\Middleware\MiddlewareMQManager());
 $app->add(new \Slim\Middleware\MiddlewareBLLManager());
 $app->add(new \Slim\Middleware\MiddlewareDalManager());
 $app->add(new \Slim\Middleware\MiddlewareServiceManager());
-$app->add(new \Slim\Middleware\MiddlewareMQManager());
+
 
 
 
@@ -49,7 +50,6 @@ $app->add(new \Slim\Middleware\MiddlewareMQManager());
  * @since 11-09-2014
  */
 $app->get("/fillComboBox_syslanguage/", function () use ($app ) {
-
     
     $BLL = $app->getBLLManager()->get('sysLanguageBLL'); 
     
@@ -100,7 +100,55 @@ $app->get("/fillComboBox_syslanguage/", function () use ($app ) {
   
 });
 
+ 
+/**
+ *  * Okan CIRAN
+ * @since 05.05.2016
+ */
+$app->get("/pkFillLanguageDdList_syslanguage/", function () use ($app ) {
+    $stripper = $app->getServiceManager()->get('filterChainerCustom');
+    $stripChainerFactory = new \Services\Filter\Helper\FilterChainerFactory(); 
+    $BLL = $app->getBLLManager()->get('sysLanguageBLL');
+    
+    $componentType = 'ddslick';
+    if (isset($_GET['component_type'])) {
+        $componentType = strtolower(trim($_GET['component_type']));
+    }
+    $headerParams = $app->request()->headers();
+    if(!isset($headerParams['X-Public'])) throw new Exception ('rest api "pkFillLanguageDdList_syslanguage" end point, X-Public variable not found');
+    //$pk = $headerParams['X-Public'];
+    
+    $vLanguageCode = 'tr';
+    if (isset($_GET['language_code'])) {
+         $stripper->offsetSet('language_code',$stripChainerFactory->get(stripChainers::FILTER_ONLY_LANGUAGE_CODE,
+                                                $app,
+                                                $_GET['language_code']));
+    }
+    $stripper->strip();
+    if($stripper->offsetExists('language_code')) $vLanguageCode = $stripper->offsetGet('language_code')->getFilterValue();
+        
+    $resCombobox = $BLL->fillLanguageDdList(array(                                   
+                                    'language_code' => $vLanguageCode,
+                        ));    
 
-
+    $flows = array();
+    $flows[] = array("text" => "Lütfen Seçiniz", "value" => 0, "selected" => true, "imageSrc" => "", "description" => "Lütfen Seçiniz",); 
+    foreach ($resCombobox as $flow) {
+        $flows[] = array(            
+            "text" => $flow["name"],
+            "value" =>  intval($flow["id"]),
+            "selected" => false,
+            "description" => $flow["name_eng"],
+            "imageSrc"=>"",              
+            "attributes" => array( 
+                                    "active" => $flow["active"], 
+                   
+                ),
+        );
+    }
+    $app->response()->header("Content-Type", "application/json");
+    $app->response()->body(json_encode($flows));
+});
+ 
 
 $app->run();

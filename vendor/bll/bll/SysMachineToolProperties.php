@@ -1,10 +1,10 @@
 <?php
 
 /**
- * OSTİM TEKNOLOJİ Framework 
+ * OSB İMALAT Framework 
  *
  * @link      https://github.com/corner82/slim_test for the canonical source repository
- * @copyright Copyright (c) 2015 OSTİM TEKNOLOJİ (http://www.ostim.com.tr)
+ * @copyright Copyright (c) 2015 OSB İMALAT (http://www.uretimosb.com)
  * @license   
  */
 
@@ -73,7 +73,7 @@ class SysMachineToolProperties extends \BLL\BLLSlim {
         $resultSet = $DAL->fillGrid($params);
         return $resultSet['resultSet'];
     }
-
+     
     /**
      * Function to get datagrid row count on user interface layer
      * @param array $params
@@ -86,7 +86,7 @@ class SysMachineToolProperties extends \BLL\BLLSlim {
     }
 
   
-         /**
+    /**
      * Data update function   
      * @param array $params
      * @return array
@@ -96,7 +96,7 @@ class SysMachineToolProperties extends \BLL\BLLSlim {
         return $DAL->fillMachineToolFullProperties($params);
     }
     
-      /**
+    /**
      * Function to get datagrid row count on user interface layer
      * @param array | null $params
      * @return array
@@ -106,7 +106,38 @@ class SysMachineToolProperties extends \BLL\BLLSlim {
         $resultSet = $DAL->fillMachineToolFullPropertiesRtc($params);  
         return $resultSet['resultSet'];
     }
-
+   
  
+    /**
+     * Function to fill User Communications Types on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillPropertyUnits ($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolPropertiesPDO');
+        $resultSet = $DAL->fillPropertyUnits($params);  
+        return $resultSet['resultSet'];
+    }
+ 
+    /**
+     * Data delete function
+     * @param array $params
+     * @return array
+     */
+    public function deletePropertyMachine($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolPropertiesPDO');
+        return $DAL->deletePropertyMachine($params);
+    }
+    
+    /**
+     * Function to fill datagrid on user interface layer
+     * @param array | null $params
+     * @return array
+     */
+    public function fillMachinePropertiesSubGridList($params = array()) {
+        $DAL = $this->slimApp->getDALManager()->get('sysMachineToolPropertiesPDO');
+        $resultSet = $DAL->fillMachinePropertiesSubGridList($params);
+        return $resultSet['resultSet'];
+    }
     
 }
